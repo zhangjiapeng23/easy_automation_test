@@ -1,5 +1,5 @@
 
-from easy_automation_test.core.base_page import BasePage
+from easy_automation.core.base_page import BasePage
 
 
 class {{ project_name }}MainPage(BasePage):

@@ -4,9 +4,9 @@
 # @data  : 2021/7/14
 import requests
 
-from utils.custom_logging import Logs
-from utils.setting import setting
-from utils.exception import ProjectHostNotSet
+from ..utils.custom_logging import Logs
+from ..utils.setting import setting
+from ..utils.exception import ProjectHostNotSet
 
 
 class RequestBase:

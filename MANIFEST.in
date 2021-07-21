@@ -1,0 +1,2 @@
+global-exclude __pycache__
+recursive-include src/easy_automation/project_templates *.py-tpl

@@ -5,20 +5,22 @@
 
 import requests
 import os
-import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
-from setting import WEB_SERVER_HOST, TESTCASES_UPLOAD_URL, PROJECT_NAME
-
-
-root_dir = os.path.join(os.path.dirname(__file__), '..')
+from .setting import setting
+from .exception import CommandError
 
 
 def update_testcases():
+    try:
+        WEB_SERVER_HOST = setting.WEB_SERVER_HOST
+        TESTCASES_UPLOAD_URL = setting.TESTCASES_UPLOAD_URL
+    except AttributeError:
+        msg = 'WEB_SERVER_HOST or TESTCASES_UPLOAD_URL not set in settings'
+        raise CommandError(msg)
+
     upload_server = WEB_SERVER_HOST + TESTCASES_UPLOAD_URL
     testcases = []
-    testcase_record_file = os.path.join(root_dir, 'testcases_nodeid_record.txt')
+    testcase_record_file = os.path.join(os.getcwd(), 'testcases_nodeid_record.txt')
     with open(testcase_record_file, 'r', encoding='utf-8') as f:
         for line in f.readlines():
             testcase = {}

@@ -33,3 +33,9 @@ class ProjectHostNotSet(Exception):
 
     def __str__(self):
         return 'Project host not set in settings.'
+
+
+class CommandError(Exception):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

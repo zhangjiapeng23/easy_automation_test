@@ -3,7 +3,9 @@
 # @author: James Zhang
 # @data  : 2021/7/19
 import keyword
+import time
 from collections import abc
+from functools import wraps
 
 
 class Singleton(type):
@@ -44,3 +46,24 @@ class FrozenJson:
                 raise AttributeError(msg.format(self.__class__.__name__, name))
             else:
                 return FrozenJson(self.__data[name])
+
+def http_retry(retry_times=3):
+
+    def decorator(func):
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            nonlocal retry_times
+            while retry_times > 0:
+                resp = func(*args, **kwargs)
+                if resp.status_code != 201:
+                    retry_times -= 1
+                    time.sleep(10)
+                    continue
+                else:
+                    break
+            return resp
+
+        return wrapper
+
+    return decorator

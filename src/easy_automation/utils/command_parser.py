@@ -5,8 +5,10 @@
 
 import argparse
 
+from easy_automation.core.template_command import TemplateCommand
 
-def cmd_parser():
+
+def command_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('create_project',
                         type=str,
@@ -16,8 +18,9 @@ def cmd_parser():
                         type=str,
                         help='project folder name')
     args = parser.parse_args()
-    print(args.create_project, args.project_name)
+    template_command = TemplateCommand(action=args.create_project, project_name=args.project_name)
+    template_command.handle()
 
 
 if __name__ == '__main__':
-    cmd_parser()
+    command_parser()

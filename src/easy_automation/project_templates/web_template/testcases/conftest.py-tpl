@@ -4,7 +4,7 @@ import re
 import time
 from typing import List
 
-from easy_automation_test.utils.custom_logging import Logs
+from easy_automation.utils.custom_logging import Logs
 
 log = Logs()
 root_dir = os.path.join(os.path.dirname(__file__), "..")
