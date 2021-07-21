@@ -1,0 +1,18 @@
+'''
+    {{ project_name }} base settings
+'''
+
+# web platform settings
+WEB_PLATFORM_SERVER_HOST = ''
+WEB_PLATFORM_PROJECT_NAME = ''
+WEB_PLATFORM_REPORT_UPLOAD_URL = ''
+WEB_PLATFORM_TESTCASES_UPLOAD_URL = ''
+
+# selenium hub server url
+SELENIUM_HUB_URL = ''
+
+# project host
+PROJECT_HOST = ''
+
+
+

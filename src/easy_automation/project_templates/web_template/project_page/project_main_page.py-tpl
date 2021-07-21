@@ -1,0 +1,18 @@
+
+from easy_automation_test.core.base_page import BasePage
+
+
+class {{ project_name }}MainPage(BasePage):
+
+    def __init__(self):
+        super().__init__()
+        self.driver = self.webdriver_init()
+
+    def launch(self):
+        '''
+
+        :return:
+        '''
+
+    def quit(self):
+        self.driver.quit()
