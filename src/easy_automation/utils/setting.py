@@ -8,7 +8,7 @@ import importlib
 class Setting:
 
     def __init__(self):
-        self.SETTING_MODULE = 'setting.settings'
+        self.SETTING_MODULE = 'settings.settings'
         _settings = importlib.import_module(self.SETTING_MODULE)
         for setting in dir(_settings):
             if setting.isupper():

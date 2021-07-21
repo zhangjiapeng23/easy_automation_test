@@ -20,6 +20,16 @@ class Singleton(type):
         return cls._instances[args[0]]
 
 
+def singleton(cls):
+    _instance = {}
+
+    def inner(*args, **kwargs):
+        if cls not in _instance:
+            _instance[cls] = cls(*args, **kwargs)
+        return _instance[cls]
+    return inner
+
+
 class FrozenJson:
 
     def __new__(cls, arg):
@@ -46,6 +56,7 @@ class FrozenJson:
                 raise AttributeError(msg.format(self.__class__.__name__, name))
             else:
                 return FrozenJson(self.__data[name])
+
 
 def http_retry(retry_times=3):
 

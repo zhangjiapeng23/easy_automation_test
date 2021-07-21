@@ -8,17 +8,20 @@ import os
 
 from .setting import setting
 from .exception import CommandError
+from .custom_logging import Logs
+
+log = Logs()
 
 
 def update_testcases():
     try:
-        WEB_SERVER_HOST = setting.WEB_SERVER_HOST
-        TESTCASES_UPLOAD_URL = setting.TESTCASES_UPLOAD_URL
+        WEB_PLATFORM_SERVER_HOST = setting.WEB_PLATFORM_SERVER_HOST
+        WEB_PLATFORM_TESTCASES_UPLOAD_URL = setting.WEB_PLATFORM_TESTCASES_UPLOAD_URL
     except AttributeError:
         msg = 'WEB_SERVER_HOST or TESTCASES_UPLOAD_URL not set in settings'
         raise CommandError(msg)
 
-    upload_server = WEB_SERVER_HOST + TESTCASES_UPLOAD_URL
+    upload_server = WEB_PLATFORM_SERVER_HOST + WEB_PLATFORM_TESTCASES_UPLOAD_URL
     testcases = []
     testcase_record_file = os.path.join(os.getcwd(), 'testcases_nodeid_record.txt')
     with open(testcase_record_file, 'r', encoding='utf-8') as f:
@@ -28,8 +31,4 @@ def update_testcases():
             testcases.append(testcase)
 
     resp = requests.post(url=upload_server, json=testcases)
-    print(resp.json())
-
-
-if __name__ == '__main__':
-    update_testcases()
+    log.info(resp.json())

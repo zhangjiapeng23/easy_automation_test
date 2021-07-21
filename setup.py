@@ -25,6 +25,13 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent"
     ],
+    install_requires=[
+        'requests>=2.26.0',
+        'selenium>=3.141.0',
+        'allure-pytest>=2.9.43',
+        'PyYAML>=5.4.1',
+        'Faker>=8.10.1'
+    ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     include_package_data=True,
