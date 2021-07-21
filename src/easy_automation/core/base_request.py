@@ -10,7 +10,7 @@ from ..utils.exception import ProjectHostNotSet
 
 
 class RequestBase:
-    log = Logs()
+    log = Logs(__name__)
 
     def __init__(self):
         try:

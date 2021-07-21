@@ -10,7 +10,7 @@ from .setting import setting
 from .exception import CommandError
 from .custom_logging import Logs
 
-log = Logs()
+log = Logs(__name__)
 
 
 def update_testcases():
