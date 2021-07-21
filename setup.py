@@ -16,9 +16,9 @@ setuptools.setup(
     description='Easy to create a web, mobile or api automation test project',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url="",
+    url="https://github.com/zhangjiapeng23/easy_automation_test",
     project_urls={
-        "Bug Tracker": ""
+        "Bug Tracker": "https://github.com/zhangjiapeng23/easy_automation_test/issues"
     },
     classifiers=[
         "Programming Language :: Python :: 3",
