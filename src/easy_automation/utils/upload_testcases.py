@@ -9,6 +9,7 @@ import os
 from .setting import setting
 from .exception import CommandError
 from .custom_logging import Logs
+from .common import find_project_root_dir
 
 log = Logs(__name__)
 
@@ -23,7 +24,7 @@ def update_testcases():
 
     upload_server = WEB_PLATFORM_SERVER_HOST + WEB_PLATFORM_TESTCASES_UPLOAD_URL
     testcases = []
-    testcase_record_file = os.path.join(os.getcwd(), 'testcases_nodeid_record.txt')
+    testcase_record_file = os.path.join(find_project_root_dir(), 'testcases_nodeid_record.txt')
     with open(testcase_record_file, 'r', encoding='utf-8') as f:
         for line in f.readlines():
             testcase = {}

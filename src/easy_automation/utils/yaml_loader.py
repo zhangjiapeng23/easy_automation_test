@@ -6,8 +6,7 @@ import os
 
 import yaml
 
-from easy_automation.utils.common import Singleton, FrozenJson
-
+from easy_automation.utils.common import Singleton, FrozenJson, find_project_root_dir
 
 class YamlLoader(metaclass=Singleton):
     _yaml_file_loader = {}
@@ -17,7 +16,7 @@ class YamlLoader(metaclass=Singleton):
         yaml_file should only pass file name under testdata directory
         :param yaml_file:
         '''
-        yaml_file = os.path.join(os.getcwd(), 'testdata', yaml_file)
+        yaml_file = os.path.join(find_project_root_dir(), 'testdata', yaml_file)
         if not (yaml_file.endswith('.yaml') or yaml_file.endswith('.yml')):
             raise TypeError('Only support parse yaml format file.')
         if not os.path.isfile(yaml_file):

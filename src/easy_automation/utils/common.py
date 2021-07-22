@@ -3,10 +3,12 @@
 # @author: James Zhang
 # @data  : 2021/7/19
 import keyword
+import os
 import time
 from collections import abc
 from functools import wraps
 
+from .exception import PathFindError
 
 class Singleton(type):
 
@@ -78,3 +80,17 @@ def http_retry(retry_times=3):
         return wrapper
 
     return decorator
+
+
+def find_project_root_dir():
+    cur_dir = os.getcwd()
+    while True:
+        root, _, files = next(os.walk(cur_dir))
+        if 'manage.py' in files:
+            return root
+        else:
+            higher_dir = os.path.dirname(cur_dir)
+            if higher_dir == cur_dir:
+                raise PathFindError
+            else:
+                cur_dir = higher_dir
