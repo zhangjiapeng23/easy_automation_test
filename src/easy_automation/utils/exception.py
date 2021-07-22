@@ -39,3 +39,10 @@ class CommandError(Exception):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+class PathFindError(Exception):
+
+    def __str__(self):
+        return "Can't find manage.py file, please make sure this file " \
+               "under project root dir"

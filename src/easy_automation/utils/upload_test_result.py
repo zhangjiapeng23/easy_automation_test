@@ -7,10 +7,11 @@ import os
 
 import requests
 
-from .common import http_retry
+from .common import http_retry, find_project_root_dir
 from .setting import setting
 from .exception import CommandError
 from .custom_logging import Logs
+
 
 log = Logs(__name__)
 
@@ -25,7 +26,7 @@ def update_result(build_url):
         raise CommandError(msg)
 
     upload_url = WEB_PLATFORM_SERVER_HOST + WEB_PLATFORM_REPORT_UPLOAD_URL
-    result_file = os.path.join(os.getcwd(), 'result_summary.json')
+    result_file = os.path.join(find_project_root_dir(), 'result_summary.json')
     with open(result_file, 'r', encoding='utf-8') as fp:
         result_data = json.load(fp)
     result_data['build_url'] = build_url
