@@ -33,14 +33,15 @@ class TemplateCommand:
 
     def handle(self):
         base_name = self.project_name
-        camel_case_name = self.project_name.title()
+        camel_case_name = ''.join([i.title() for i in self.project_name.split('_')])
         project_folder_name = base_name + self.action_project_folder_map[self.action]
 
         top_dir = os.path.join(os.getcwd(), project_folder_name)
         try:
             os.mkdir(top_dir)
         except FileExistsError:
-            raise CommandError("'%s' already exists" % top_dir)
+            msg = "Path %s already exists" % top_dir
+            raise CommandError(msg)
         except OSError as e:
             raise CommandError(e)
 
@@ -72,7 +73,7 @@ class TemplateCommand:
                         new_path = new_path[:-len(old_suffix)] + new_suffix
                         break
 
-                if new_path.endswith('.py'):
+                if new_path.endswith(('.py', '.yml')):
                     with open(old_path, 'r', encoding='utf-8') as template_file:
                         content = template_file.read()
                         template_render = TemplateRender(content)
