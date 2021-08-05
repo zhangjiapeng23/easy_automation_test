@@ -30,7 +30,8 @@ setuptools.setup(
         'selenium>=3.141.0',
         'allure-pytest>=2.9.43',
         'PyYAML>=5.4.1',
-        'Faker>=8.10.1'
+        'Faker>=8.10.1',
+        'Appium-Python-Client>=1.2.0'
     ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
