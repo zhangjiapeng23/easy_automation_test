@@ -20,6 +20,12 @@ class SeleniumHubNotSet(Exception):
         return 'if run in prod module, should set selenium hub server url in settings'
 
 
+class AppiumServerNotSet(Exception):
+
+    def __str__(self):
+        return 'if run in debug module, should set appium server url in settings'
+
+
 class SeleniumHubUrlInvalid(Exception):
 
     def __init__(self, selenium_url):
@@ -27,6 +33,15 @@ class SeleniumHubUrlInvalid(Exception):
 
     def __str__(self):
         return 'selenium url: {} in settings is invalid.'
+
+
+class AppiumServerUrlInvalid(Exception):
+
+    def __init__(self, appium_url):
+        self.url = appium_url
+
+    def __str__(self):
+        return 'appium url: {} in settings is invalid.'
 
 
 class ProjectHostNotSet(Exception):

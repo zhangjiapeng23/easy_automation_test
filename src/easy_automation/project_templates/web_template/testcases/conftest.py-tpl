@@ -40,11 +40,12 @@ def pytest_collection_modifyitems(
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
     result = {}
-    total = terminalreporter._numcollected
+    # total = terminalreporter._numcollected
     passed = len([i for i in terminalreporter.stats.get('passed', []) if i.when != 'teardown'])
     failed = len([i for i in terminalreporter.stats.get('failed', []) if i.when != 'teardown'])
     error = len([i for i in terminalreporter.stats.get('error', []) if i.when != 'teardown'])
     skipped = len([i for i in terminalreporter.stats.get('skipped', []) if i.when != 'teardown'])
+    total = passed + failed + error + skipped
     passed_rate = '%.2f' % (passed / total * 100) + '%' if total > 0 else 0
     duration = time.time() - terminalreporter._sessionstarttime
     result_format = 'total: {}, passed: {}, failed: {}, error: {}, skipped: {}, passed_rate: {}, duration: {}'

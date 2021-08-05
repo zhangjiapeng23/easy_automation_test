@@ -4,6 +4,7 @@
 # @data  : 2021/7/27
 
 from selenium.webdriver.common.by import By
+from appium.webdriver.common.mobileby import MobileBy
 
 
 class Xpath:
@@ -99,4 +100,52 @@ class CssSelector:
 
     def __get__(self, instance, owner):
         return By.CSS_SELECTOR, self._element_location
+
+
+class IosPredicate:
+
+    def __init__(self, element_location):
+        self._element_location = element_location
+
+    def __set__(self, instance, value):
+        raise AttributeError("can't set attribute")
+
+    def __get__(self, instance, owner):
+        return MobileBy.IOS_PREDICATE, self._element_location
+
+
+class AccessibilityId:
+
+    def __init__(self, element_location):
+        self._element_location = element_location
+
+    def __set__(self, instance, value):
+        raise AttributeError("can't set attribute")
+
+    def __get__(self, instance, owner):
+        return MobileBy.ACCESSIBILITY_ID, self._element_location
+
+
+class Image:
+
+    def __init__(self, element_location):
+        self._element_location = element_location
+
+    def __set__(self, instance, value):
+        raise AttributeError("can't set attribute")
+
+    def __get__(self, instance, owner):
+        return MobileBy.IMAGE, self._element_location
+
+
+class Custom:
+
+    def __init__(self, element_location):
+        self._element_location = element_location
+
+    def __set__(self, instance, value):
+        raise AttributeError("can't set attribute")
+
+    def __get__(self, instance, owner):
+        return MobileBy.CUSTOM, self._element_location
 

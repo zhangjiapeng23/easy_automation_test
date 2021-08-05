@@ -13,13 +13,15 @@ class TemplateCommand:
     action_template_map = {
         'startWebProject': 'web_template',
         'startApiProject': 'api_template',
-        'startMobileProject': 'mobile_template'
+        'startAndroidProject': 'android_template',
+        'startIosProject': 'ios_template'
     }
 
     action_project_folder_map = {
         'startWebProject': '_web_test',
         'startApiProject': '_api_test',
-        'startMobileProject': '_mobile_test'
+        'startAndroidProject': '_Android_test',
+        'startIosProject': '_iOS_test',
     }
 
     rewrite_template_suffixes = (
