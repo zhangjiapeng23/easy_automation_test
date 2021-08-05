@@ -2,19 +2,29 @@
 # -*- encoding: utf-8 -*-
 # @author: James Zhang
 # @data  : 2021/3/15
+import inspect
 from functools import wraps
 
 from appium.webdriver.common.mobileby import MobileBy
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 import allure
 
-from ..utils.custom_logging import Logs
+from easy_automation.utils.custom_logging import Logs
 
 log = Logs(__name__)
 
-BLACK_LIST = ('//*[@text="test_not_find"]',
-              '//*[@resource-id="com.xueqiu.android:id/iv_close"]',
-              '//*[@resource-id="com.xueqiu.android:id/image_cancel"]')
+BLACK_LIST = []
+
+
+def blacklist_collect(cls):
+
+    members = inspect.getmembers(cls)
+    for mem in members:
+        if mem[0].startswith('__'):
+            continue
+        else:
+            BLACK_LIST.append(mem[1])
+    return cls
 
 
 def blacklist_handler(func):
@@ -24,8 +34,8 @@ def blacklist_handler(func):
         try:
             return func(self, *args, **kwargs)
         except (NoSuchElementException, TimeoutException) as exc:
-            for black in BLACK_LIST:
-                element = self.finds((MobileBy.XPATH, black), timeout=2)
+            for element_selector in BLACK_LIST:
+                element = self.driver.find_elements(*element_selector)
                 if element:
                     element[0].click()
                     # use handle_blacklist decorator call func again,
