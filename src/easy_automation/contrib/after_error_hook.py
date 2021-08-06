@@ -2,10 +2,8 @@
 # -*- encoding: utf-8 -*-
 # @author: James Zhang
 # @data  : 2021/3/15
-import inspect
 from functools import wraps
 
-from appium.webdriver.common.mobileby import MobileBy
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 import allure
 
@@ -13,40 +11,41 @@ from easy_automation.utils.custom_logging import Logs
 
 log = Logs(__name__)
 
-BLACK_LIST = []
+AFTER_ERROR_EVENTS = []
 
 
-def blacklist_collect(cls):
+def after_error(func):
+    """
+    define if location element error, will trigger function
+    this function will return false or True.
+    execute successfully should return True,
+    execute failed should return False.
+    note: this func should always not error occurred.
+    and only have a param: driver
+    :param func:
+    :return:
+    """
+    AFTER_ERROR_EVENTS.append(func)
+    return func
 
-    members = inspect.getmembers(cls)
-    for mem in members:
-        if mem[0].startswith('__'):
-            continue
-        else:
-            BLACK_LIST.append(mem[1])
-    return cls
 
-
-def blacklist_handler(func):
+def after_error_hook(func):
 
     @wraps(func)
     def wrap(self, *args, **kwargs):
         try:
             return func(self, *args, **kwargs)
         except (NoSuchElementException, TimeoutException) as exc:
-            for element_selector in BLACK_LIST:
-                element = self.driver.find_elements(*element_selector)
-                if element:
-                    element[0].click()
+            for event in AFTER_ERROR_EVENTS:
+                res = event(self.driver)
+                if res:
                     # use handle_blacklist decorator call func again,
                     # to deal with multiple blacklist display at same time.
-                    decorator = blacklist_handler(func)
-                    return decorator(self, *args, *kwargs)
+                    return after_error_hook(func(self, *args, *kwargs))
             else:
                 allure.attach(self.screenshot(), attachment_type=allure.attachment_type.PNG)
                 log.error(f'Element find failed: {exc}')
                 raise exc
-
     return wrap
 
 

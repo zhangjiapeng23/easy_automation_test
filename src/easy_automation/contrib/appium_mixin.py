@@ -9,7 +9,8 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from easy_automation.contrib import elements
 from easy_automation.utils.custom_logging import Logs
-from .blacklist_handler import blacklist_handler
+from .after_error_hook import after_error_hook
+from .before_click_hook import before_click_hook
 
 log = Logs(__name__)
 
@@ -21,25 +22,26 @@ class AppiumMixin:
     # def __init__(self, driver: WebDriver):
     #     self.driver = driver
 
-    @blacklist_handler
+    @after_error_hook
     def find(self, element_selector, timeout=EXPLICIT_WAIT):
         log.info(f'Find element {element_selector[1]}')
         return WebDriverWait(self.driver, timeout)\
             .until(EC.presence_of_element_located(element_selector))
 
-    @blacklist_handler
+    @after_error_hook
     def finds(self, element_selector, timeout=EXPLICIT_WAIT):
         log.info(f'Find elements {element_selector[1]}')
         return WebDriverWait(self.driver, timeout=timeout)\
             .until(EC.presence_of_all_elements_located(element_selector))
 
-    @blacklist_handler
+    @after_error_hook
     def click_element(self, element_selector, timeout=EXPLICIT_WAIT):
         element = WebDriverWait(self.driver, timeout=timeout) \
             .until(EC.element_to_be_clickable(element_selector))
+        before_click_hook(self.driver)
         element.click()
 
-    @blacklist_handler
+    @after_error_hook
     def click_elements(self, element_selector, timeout=EXPLICIT_WAIT, _slice=None):
         """
         :param element_seletctor:
@@ -52,6 +54,7 @@ class AppiumMixin:
         if _slice and isinstance(_slice, slice):
             elements = elements[_slice]
         for element in elements:
+            before_click_hook(self.driver)
             element.click()
 
     def send_value(self, element_selector, value, timeout=EXPLICIT_WAIT):
