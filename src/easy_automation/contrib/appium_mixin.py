@@ -7,6 +7,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+from easy_automation.contrib import elements
 from easy_automation.utils.custom_logging import Logs
 from .blacklist_handler import blacklist_handler
 
@@ -15,6 +16,7 @@ log = Logs(__name__)
 
 class AppiumMixin:
     EXPLICIT_WAIT = 8
+    android_toast = elements.Xpath("//android.widget.Toast")
 
     # def __init__(self, driver: WebDriver):
     #     self.driver = driver
@@ -67,6 +69,18 @@ class AppiumMixin:
                 self.driver.swipe(width * 0.5, height * 0.75, width * 0.5, height * 0.25)
                 max_time -= 1
         raise NoSuchElementException(element_selector)
+
+    def get_element_text(self, element_selector, timeout=EXPLICIT_WAIT):
+        return self.find(element_selector, timeout).text
+
+    def get_elements_text(self, element_selector, timeout=EXPLICIT_WAIT, _slice=None):
+        elements = self.finds(element_selector, timeout)
+        if _slice and isinstance(_slice, slice):
+            elements = elements[_slice]
+        return (element.text for element in elements)
+
+    def get_toast(self, timeout=EXPLICIT_WAIT):
+        return self.get_element_text(self.android_toast, timeout)
 
     def screenshot(self):
         log.info('Get screenshot.')
