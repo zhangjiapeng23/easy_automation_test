@@ -41,12 +41,9 @@ def after_error_hook(func):
                 if res:
                     # use handle_blacklist decorator call func again,
                     # to deal with multiple blacklist display at same time.
-                    return after_error_hook(func(self, *args, *kwargs))
+                    return after_error_hook(func)(self, *args, *kwargs)
             else:
                 allure.attach(self.screenshot(), attachment_type=allure.attachment_type.PNG)
                 log.error(f'Element find failed: {exc}')
                 raise exc
     return wrap
-
-
-

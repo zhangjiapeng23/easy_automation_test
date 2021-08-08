@@ -60,16 +60,18 @@ class AppiumMixin:
     def send_value(self, element_selector, value, timeout=EXPLICIT_WAIT):
         self.find(element_selector, timeout).send_keys(value)
 
+    @after_error_hook
     def scroll_up_find(self, element_selector, timeout=EXPLICIT_WAIT, max_time=5):
         while max_time:
-            element = self.finds(element_selector, timeout)
+            element = self.driver.find_elements(*element_selector)
+            log.debug(f'scorll up find {element}')
             if element:
                 return element[0]
             else:
                 screen_size = self.driver.get_window_size()
                 width = screen_size['width']
                 height = screen_size['height']
-                self.driver.swipe(width * 0.5, height * 0.75, width * 0.5, height * 0.25)
+                self.driver.swipe(width * 0.5, height * 0.6, width * 0.5, height * 0.3)
                 max_time -= 1
         raise NoSuchElementException(element_selector)
 
