@@ -64,7 +64,7 @@ class AppiumMixin:
     def scroll_up_find(self, element_selector, timeout=EXPLICIT_WAIT, max_time=5):
         while max_time:
             element = self.driver.find_elements(*element_selector)
-            log.debug(f'scorll up find {element}')
+            log.debug(f'scroll up find {element}')
             if element:
                 return element[0]
             else:
