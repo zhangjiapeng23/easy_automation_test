@@ -127,7 +127,7 @@ class AppiumMixin:
                 return element[0]
             else:
                 width, height = ele_size['width'], ele_size['height']
-                x, y = ele_location['x'], ele_location[y]
+                x, y = ele_location['x'], ele_location['y']
                 start_position = (width * 0.8, y + height * 0.5)
                 end_position = (width * 0.2, y + height * 0.5)
                 self.swipe(start_position, end_position)
@@ -145,7 +145,7 @@ class AppiumMixin:
                 return element[0]
             else:
                 width, height = ele_size['width'], ele_size['height']
-                x, y = ele_location['x'], ele_location[y]
+                x, y = ele_location['x'], ele_location['y']
                 start_position = (width * 0.2, y + height * 0.5)
                 end_position = (width * 0.8, y + height * 0.5)
                 self.swipe(start_position, end_position)
