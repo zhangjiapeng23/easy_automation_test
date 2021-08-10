@@ -2,8 +2,10 @@
 # -*- encoding: utf-8 -*-
 # @author: James Zhang
 # @data  : 2021/7/27
+from typing import List
 
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 
@@ -15,7 +17,7 @@ log = Logs(__name__)
 class SeleniumMixin:
     EXPLICIT_WAIT = 8
 
-    def find(self, element_selector, timeout=EXPLICIT_WAIT):
+    def find(self, element_selector, timeout=EXPLICIT_WAIT) -> WebElement:
         """
         :param timeout:
         :param element_selector:
@@ -26,7 +28,7 @@ class SeleniumMixin:
         return WebDriverWait(self.driver, timeout=timeout)\
             .until(EC.presence_of_element_located(element_selector))
 
-    def finds(self, element_selector, timeout=EXPLICIT_WAIT):
+    def finds(self, element_selector, timeout=EXPLICIT_WAIT) -> List:
         """
         :param  timeout:
         :param element_selector:
@@ -68,7 +70,7 @@ class SeleniumMixin:
     def action_chain(self):
         return ActionChains(self.driver)
 
-    def scroll_find(self, element_selector, timeout=EXPLICIT_WAIT):
+    def scroll_find(self, element_selector, timeout=EXPLICIT_WAIT) -> WebElement:
         element = WebDriverWait(self.driver, timeout=timeout).until(EC.presence_of_element_located(element_selector))
         self.driver.execute_script("arguments[0].scrollIntoView();", element)
         return element
@@ -76,7 +78,7 @@ class SeleniumMixin:
     def scroll_click(self, element_selector, timeout=EXPLICIT_WAIT):
         self.scroll_find(element_selector, timeout).click()
 
-    def _clickable_elements(self, element_selector, timeout=EXPLICIT_WAIT):
+    def _clickable_elements(self, element_selector, timeout=EXPLICIT_WAIT) -> WebElement:
         """
         :param element_seletctor:
         :param timeout:

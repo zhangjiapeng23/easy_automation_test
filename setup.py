@@ -10,7 +10,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name='easy-automation-test',
-    version='0.0.2',
+    version='0.0.3',
     author='jameszhang',
     author_email='18373230129@163.com',
     description='Easy to create a web, mobile or api automation test project',
@@ -31,7 +31,8 @@ setuptools.setup(
         'allure-pytest>=2.9.43',
         'PyYAML>=5.4.1',
         'Faker>=8.10.1',
-        'Appium-Python-Client>=1.2.0'
+        'Appium-Python-Client>=1.2.0',
+        'pytest-xdist>=2.3.0'
     ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
