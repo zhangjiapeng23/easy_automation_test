@@ -3,9 +3,10 @@
 # @author: James Zhang
 # @data  : 2021/8/5
 from appium.webdriver.webdriver import WebDriver
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, InvalidElementStateException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from appium.webdriver.webelement import WebElement
 
 from easy_automation.contrib import elements
 from easy_automation.utils.custom_logging import Logs
@@ -19,8 +20,8 @@ class AppiumMixin:
     EXPLICIT_WAIT = 8
     android_toast = elements.Xpath("//android.widget.Toast")
 
-    # def __init__(self, driver: WebDriver):
-    #     self.driver = driver
+    def __init__(self, driver: WebDriver):
+        self.driver = driver.find_element()
 
     @after_error_hook
     def find(self, element_selector, timeout=EXPLICIT_WAIT):
@@ -31,15 +32,34 @@ class AppiumMixin:
     @after_error_hook
     def finds(self, element_selector, timeout=EXPLICIT_WAIT):
         log.info(f'Find elements {element_selector[1]}')
-        return WebDriverWait(self.driver, timeout=timeout)\
+        return WebDriverWait(self.driver, timeout)\
             .until(EC.presence_of_all_elements_located(element_selector))
 
     @after_error_hook
+    def find_from_element(self, element: WebElement, element_selector):
+        return element.find_element(*element_selector)
+
+    @after_error_hook
+    def finds_from_element(self, element: WebElement, element_selector):
+        return element.find_elements(*element_selector)
+
+    @after_error_hook
     def click_element(self, element_selector, timeout=EXPLICIT_WAIT):
-        element = WebDriverWait(self.driver, timeout=timeout) \
+        element = WebDriverWait(self.driver, timeout) \
             .until(EC.element_to_be_clickable(element_selector))
         before_click_hook(self.driver)
         element.click()
+
+    def click_position(self, position):
+        before_click_hook(self.driver)
+        self.driver.tap([position])
+
+    def swipe(self, start_position: tuple, end_position: tuple):
+        before_click_hook(self.driver)
+        try:
+            self.driver.swipe(*start_position, *end_position)
+        except InvalidElementStateException as e:
+            log.warning(e)
 
     @after_error_hook
     def click_elements(self, element_selector, timeout=EXPLICIT_WAIT, _slice=None):
@@ -61,17 +81,72 @@ class AppiumMixin:
         self.find(element_selector, timeout).send_keys(value)
 
     @after_error_hook
-    def scroll_up_find(self, element_selector, timeout=EXPLICIT_WAIT, max_time=5):
+    def scroll_up_find(self, element_selector, max_time=5):
+        screen_size = self.driver.get_window_size()
+        width = screen_size['width']
+        height = screen_size['height']
         while max_time:
             element = self.driver.find_elements(*element_selector)
             log.debug(f'scroll up find {element}')
             if element:
                 return element[0]
             else:
-                screen_size = self.driver.get_window_size()
-                width = screen_size['width']
-                height = screen_size['height']
-                self.driver.swipe(width * 0.5, height * 0.6, width * 0.5, height * 0.3)
+                start_position = (width * 0.5, height * 0.6)
+                end_position = (width * 0.5, height * 0.3)
+                self.swipe(start_position, end_position)
+                max_time -= 1
+        raise NoSuchElementException(element_selector)
+
+    @after_error_hook
+    def scroll_down_find(self, element_selector, max_time=5):
+        screen_size = self.driver.get_window_size()
+        width = screen_size['width']
+        height = screen_size['height']
+        while max_time:
+            element = self.driver.find_elements(*element_selector)
+            log.debug(f'scroll down find {element}')
+            if element:
+                return element[0]
+            else:
+                start_position = (width * 0.5, height * 0.3)
+                end_position = (width * 0.5, height * 0.6)
+                self.swipe(start_position, end_position)
+                max_time -= 1
+        raise NoSuchElementException(element_selector)
+
+    @after_error_hook
+    def swipe_element_left_find(self, element: WebElement, element_selector, max_time=5):
+        ele_location = element.location
+        ele_size = element.size
+        while max_time:
+            element = self.driver.find_elements(*element_selector)
+            log.debug(f'scroll left find {element}')
+            if element:
+                return element[0]
+            else:
+                width, height = ele_size['width'], ele_size['height']
+                x, y = ele_location['x'], ele_location[y]
+                start_position = (width * 0.8, y + height * 0.5)
+                end_position = (width * 0.2, y + height * 0.5)
+                self.swipe(start_position, end_position)
+                max_time -= 1
+        raise NoSuchElementException(element_selector)
+
+    @after_error_hook
+    def swipe_element_right_find(self, element: WebElement, element_selector, max_time=5):
+        ele_location = element.location
+        ele_size = element.size
+        while max_time:
+            element = self.driver.find_elements(*element_selector)
+            log.debug(f'scroll right find {element}')
+            if element:
+                return element[0]
+            else:
+                width, height = ele_size['width'], ele_size['height']
+                x, y = ele_location['x'], ele_location[y]
+                start_position = (width * 0.2, y + height * 0.5)
+                end_position = (width * 0.8, y + height * 0.5)
+                self.swipe(start_position, end_position)
                 max_time -= 1
         raise NoSuchElementException(element_selector)
 
@@ -79,7 +154,7 @@ class AppiumMixin:
         return self.find(element_selector, timeout).text
 
     def get_elements_text(self, element_selector, timeout=EXPLICIT_WAIT, _slice=None):
-        elements = self.finds(element_selector, timeout)
+        elements = self.finds(element_selector,timeout)
         if _slice and isinstance(_slice, slice):
             elements = elements[_slice]
         return (element.text for element in elements)
@@ -97,7 +172,7 @@ class AppiumMixin:
         :param timeout:
         :return:
         """
-        elements = WebDriverWait(self.driver, timeout=timeout)\
+        elements = WebDriverWait(self.driver, timeout)\
             .until(elements_to_be_clickable(element_selector))
         return elements
 
