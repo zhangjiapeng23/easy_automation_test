@@ -11,8 +11,20 @@ WEB_PLATFORM_TESTCASES_UPLOAD_URL = ''
 # selenium hub server url
 SELENIUM_HUB_URL = ''
 
+# appium server url
+APPIUM_SERVER_URL = 'http://127.0.0.1:4723/wd/hub'
+
 # project host
 PROJECT_HOST = ''
 
-
-
+# desired capabilities
+DESIRED_CAPABILITIES = {
+    "platformName": "iOS",
+    "automationName": "XCUITest",
+    "deviceName": "",
+    "bundleId": "",
+    "noReset": True,
+    "settings[waitForIdleTimeout]": 3,
+    "unicodeKeyboard": True,
+    "resetKeyboard": True
+}

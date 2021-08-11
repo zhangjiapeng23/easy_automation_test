@@ -19,7 +19,8 @@ PROJECT_HOST = ''
 
 # desired capabilities
 DESIRED_CAPABILITIES = {
-    "platformName": "",
+    "platformName": "Android",
+    "automationName": "Uiautomator2"
     "deviceName": "",
     "appPackage": "",
     "appActivity": "",

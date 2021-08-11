@@ -80,7 +80,9 @@ class AppiumMixin:
             element.click()
 
     def send_value(self, element_selector, value, timeout=EXPLICIT_WAIT):
-        self.find(element_selector, timeout).send_keys(value)
+        ele = self.find(element_selector, timeout)
+        ele.clear()
+        ele.send_keys(value)
 
     @after_error_hook
     def scroll_up_find(self, element_selector, max_time=5) -> WebElement:
