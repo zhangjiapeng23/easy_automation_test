@@ -1,0 +1,18 @@
+
+from easy_automation.core.base_appium import BaseAppium
+
+
+class {{ project_name }}App(BaseAppium):
+
+    def __init__(self):
+        super().__init__()
+        self.driver = self.webdriver_init()
+
+    def launch(self):
+        '''
+
+        :return:
+        '''
+
+    def quit(self):
+        self.driver.quit()
