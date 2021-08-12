@@ -4,7 +4,8 @@
 # @data  : 2021/3/15
 from functools import wraps
 
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.common.exceptions import NoSuchElementException, \
+    TimeoutException, StaleElementReferenceException
 import allure
 
 from easy_automation.utils.custom_logging import Logs
@@ -35,7 +36,8 @@ def after_error_hook(func):
     def wrap(self, *args, **kwargs):
         try:
             return func(self, *args, **kwargs)
-        except (NoSuchElementException, TimeoutException) as exc:
+        except (NoSuchElementException, TimeoutException,
+                StaleElementReferenceException) as exc:
             for event in AFTER_ERROR_EVENTS:
                 res = event(self.driver)
                 if res:
