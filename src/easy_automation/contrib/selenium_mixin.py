@@ -1,55 +1,69 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 # @author: James Zhang
-# @data  : 2021/7/27
+# @data  : 2021/8/5
 from typing import List
 
+from appium.webdriver.webdriver import WebDriver
+from selenium.common.exceptions import NoSuchElementException, InvalidElementStateException
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
+from appium.webdriver.webelement import WebElement
 
+from easy_automation.contrib import elements
 from easy_automation.utils.custom_logging import Logs
+from .after_error_hook import after_error_hook
+from .before_click_hook import before_click_hook
 
 log = Logs(__name__)
 
 
-class SeleniumMixin:
+class AppiumMixin:
     EXPLICIT_WAIT = 8
+    android_toast = elements.Xpath("//android.widget.Toast")
 
+    # def __init__(self, driver: WebDriver):
+    #     self.driver = driver.find_element()
+
+    @after_error_hook
     def find(self, element_selector, timeout=EXPLICIT_WAIT) -> WebElement:
-        """
-        :param timeout:
-        :param element_selector:
-        if target element can be location, return this element
-        :return:
-        selenium element
-        """
-        return WebDriverWait(self.driver, timeout=timeout)\
+        log.info(f'Find element {element_selector[1]}')
+        return WebDriverWait(self.driver, timeout)\
             .until(EC.presence_of_element_located(element_selector))
 
+    @after_error_hook
     def finds(self, element_selector, timeout=EXPLICIT_WAIT) -> List:
-        """
-        :param  timeout:
-        :param element_selector:
-        if all target elements can be location, return elements list
-        :return:
-        selenium elements list
-        """
-        log.info('find element {1} by {0}'.format(*element_selector))
-        return WebDriverWait(self.driver, timeout=timeout)\
+        log.info(f'Find elements {element_selector[1]}')
+        return WebDriverWait(self.driver, timeout)\
             .until(EC.presence_of_all_elements_located(element_selector))
 
+    @after_error_hook
+    def find_from_element(self, element: WebElement, element_selector) -> WebElement:
+        return element.find_element(*element_selector)
+
+    @after_error_hook
+    def finds_from_element(self, element: WebElement, element_selector) -> List:
+        return element.find_elements(*element_selector)
+
+    @after_error_hook
     def click_element(self, element_selector, timeout=EXPLICIT_WAIT):
-        """
-        :param element_seletctor:
-        :param timeout:
-        :return:
-        """
-        element = WebDriverWait(self.driver, timeout=timeout)\
+        element = WebDriverWait(self.driver, timeout) \
             .until(EC.element_to_be_clickable(element_selector))
+        before_click_hook(self.driver)
         element.click()
 
+    def click_position(self, position):
+        before_click_hook(self.driver)
+        self.driver.tap([position])
+
+    def swipe(self, start_position: tuple, end_position: tuple):
+        before_click_hook(self.driver)
+        try:
+            self.driver.swipe(*start_position, *end_position)
+        except InvalidElementStateException as e:
+            log.warning(e)
+
+    @after_error_hook
     def click_elements(self, element_selector, timeout=EXPLICIT_WAIT, _slice=None):
         """
         :param element_seletctor:
@@ -62,29 +76,133 @@ class SeleniumMixin:
         if _slice and isinstance(_slice, slice):
             elements = elements[_slice]
         for element in elements:
+            before_click_hook(self.driver)
             element.click()
 
     def send_value(self, element_selector, value, timeout=EXPLICIT_WAIT):
         self.find(element_selector, timeout).send_keys(value)
 
-    def action_chain(self):
-        return ActionChains(self.driver)
+    @after_error_hook
+    def scroll_up_find(self, element_selector, max_time=5) -> WebElement:
+        screen_size = self.driver.get_window_size()
+        width = screen_size['width']
+        height = screen_size['height']
+        while max_time:
+            element = self.driver.find_elements(*element_selector)
+            log.debug(f'scroll up find {element}')
+            if element:
+                return element[0]
+            else:
+                start_position = (width * 0.5, height * 0.6)
+                end_position = (width * 0.5, height * 0.3)
+                self.swipe(start_position, end_position)
+                max_time -= 1
+        raise NoSuchElementException(element_selector[1])
 
-    def scroll_find(self, element_selector, timeout=EXPLICIT_WAIT) -> WebElement:
-        element = WebDriverWait(self.driver, timeout=timeout).until(EC.presence_of_element_located(element_selector))
-        self.driver.execute_script("arguments[0].scrollIntoView();", element)
-        return element
+    @after_error_hook
+    def scroll_down_find(self, element_selector, max_time=5) -> WebElement:
+        screen_size = self.driver.get_window_size()
+        width = screen_size['width']
+        height = screen_size['height']
+        while max_time:
+            element = self.driver.find_elements(*element_selector)
+            log.debug(f'scroll down find {element}')
+            if element:
+                return element[0]
+            else:
+                start_position = (width * 0.5, height * 0.3)
+                end_position = (width * 0.5, height * 0.6)
+                self.swipe(start_position, end_position)
+                max_time -= 1
+        raise NoSuchElementException(element_selector[1])
 
-    def scroll_click(self, element_selector, timeout=EXPLICIT_WAIT):
-        self.scroll_find(element_selector, timeout).click()
+    @after_error_hook
+    def swipe_element_left_find(self, element: WebElement, element_selector, max_time=5) -> WebElement:
+        ele_location = element.location
+        ele_size = element.size
+        while max_time:
+            element = self.driver.find_elements(*element_selector)
+            log.debug(f'scroll left find {element}')
+            if element:
+                return element[0]
+            else:
+                width, height = ele_size['width'], ele_size['height']
+                x, y = ele_location['x'], ele_location['y']
+                start_position = (width * 0.8, y + height * 0.5)
+                end_position = (width * 0.2, y + height * 0.5)
+                self.swipe(start_position, end_position)
+                max_time -= 1
+        raise NoSuchElementException(element_selector[1])
 
-    def _clickable_elements(self, element_selector, timeout=EXPLICIT_WAIT) -> WebElement:
+    @after_error_hook
+    def swipe_element_right_find(self, element: WebElement, element_selector, max_time=5) -> WebElement:
+        ele_location = element.location
+        ele_size = element.size
+        while max_time:
+            element = self.driver.find_elements(*element_selector)
+            log.debug(f'scroll right find {element}')
+            if element:
+                return element[0]
+            else:
+                width, height = ele_size['width'], ele_size['height']
+                x, y = ele_location['x'], ele_location['y']
+                start_position = (width * 0.2, y + height * 0.5)
+                end_position = (width * 0.8, y + height * 0.5)
+                self.swipe(start_position, end_position)
+                max_time -= 1
+        raise NoSuchElementException(element_selector[1])
+
+    @after_error_hook
+    def swipe_left_element(self, element_selector):
+        ele = self.find(element_selector)
+        x, y = ele.location['x'], ele.location['y']
+        height, width = ele.size['height'], ele.size['width']
+        self.swipe((x + width, y + height * 0.5), (x, y + height * 0.5))
+
+    @after_error_hook
+    def swipe_right_element(self, element_selector):
+        ele = self.find(element_selector)
+        x, y = ele.location['x'], ele.location['y']
+        height, width = ele.size['height'], ele.size['width']
+        self.swipe((x, y + height * 0.5), (x + width, y + height * 0.5))
+
+    @after_error_hook
+    def swipe_up_element(self, element_selector):
+        ele = self.find(element_selector)
+        x, y = ele.location['x'], ele.location['y']
+        height, width = ele.size['height'], ele.size['width']
+        self.swipe((x + width * 0.5, y + height), (x + width * 0.5, y))
+
+    @after_error_hook
+    def swipe_down_element(self, element_selector):
+        ele = self.find(element_selector)
+        x, y = ele.location['x'], ele.location['y']
+        height, width = ele.size['height'], ele.size['width']
+        self.swipe((x + width * 0.5, y), (x + width, y + height))
+
+    def get_element_text(self, element_selector, timeout=EXPLICIT_WAIT) -> str:
+        return self.find(element_selector, timeout).text
+
+    def get_elements_text(self, element_selector, timeout=EXPLICIT_WAIT, _slice=None) -> List:
+        elements = self.finds(element_selector,timeout)
+        if _slice and isinstance(_slice, slice):
+            elements = elements[_slice]
+        return (element.text for element in elements)
+
+    def get_toast(self, timeout=EXPLICIT_WAIT) -> str:
+        return self.get_element_text(self.android_toast, timeout)
+
+    def screenshot(self):
+        log.info('Get screenshot.')
+        return self.driver.get_screenshot_as_png()
+
+    def _clickable_elements(self, element_selector, timeout=EXPLICIT_WAIT):
         """
         :param element_seletctor:
         :param timeout:
         :return:
         """
-        elements = WebDriverWait(self.driver, timeout=timeout)\
+        elements = WebDriverWait(self.driver, timeout)\
             .until(elements_to_be_clickable(element_selector))
         return elements
 
