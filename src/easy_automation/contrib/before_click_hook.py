@@ -19,6 +19,9 @@ def before_click(func):
 
 def before_click_hook(driver: WebDriver):
     for event in BEFORE_CLICK_EVENT:
-        event(driver)
+        res = event(driver)
+        if res:
+            before_click_hook(driver)
+            break
 
 
