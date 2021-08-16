@@ -1,4 +1,5 @@
-#easy automation test
+##easy automation test
+
 This library is to help developer or tester write automation
  testcases faster and easier. Include web, api, Android and iOS.
  For web UI automation basic framework depends on selenium, Api 
@@ -27,11 +28,13 @@ This library is to help developer or tester write automation
  driver and environment.
  
  - contrib
+ 
  This module provide some mixin class to help write page class,
  that encapsulation some basic selenium or appium find method,
   make them easier and more efficient.
   
  - utils
+ 
  This module provide some util class, like custom_logging, 
  custom_faker, yaml_loader, you can quick prepare test data
  or record test log by them.
