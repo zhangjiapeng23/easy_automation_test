@@ -80,9 +80,7 @@ class AppiumMixin:
             element.click()
 
     def send_value(self, element_selector, value, timeout=EXPLICIT_WAIT):
-        ele = self.find(element_selector, timeout)
-        ele.clear()
-        ele.send_keys(value)
+        self.find(element_selector, timeout).send_keys(value)
 
     @after_error_hook
     def scroll_up_find(self, element_selector, max_time=5) -> WebElement:
@@ -153,6 +151,34 @@ class AppiumMixin:
                 self.swipe(start_position, end_position)
                 max_time -= 1
         raise NoSuchElementException(element_selector[1])
+
+    @after_error_hook
+    def swipe_left_element(self, element_selector):
+        ele = self.find(element_selector)
+        x, y = ele.location['x'], ele.location['y']
+        height, width = ele.size['height'], ele.size['width']
+        self.swipe((x + width, y + height * 0.5), (x, y + height * 0.5))
+
+    @after_error_hook
+    def swipe_right_element(self, element_selector):
+        ele = self.find(element_selector)
+        x, y = ele.location['x'], ele.location['y']
+        height, width = ele.size['height'], ele.size['width']
+        self.swipe((x, y + height * 0.5), (x + width, y + height * 0.5))
+
+    @after_error_hook
+    def swipe_up_element(self, element_selector):
+        ele = self.find(element_selector)
+        x, y = ele.location['x'], ele.location['y']
+        height, width = ele.size['height'], ele.size['width']
+        self.swipe((x + width * 0.5, y + height), (x + width * 0.5, y))
+
+    @after_error_hook
+    def swipe_down_element(self, element_selector):
+        ele = self.find(element_selector)
+        x, y = ele.location['x'], ele.location['y']
+        height, width = ele.size['height'], ele.size['width']
+        self.swipe((x + width * 0.5, y), (x + width, y + height))
 
     def get_element_text(self, element_selector, timeout=EXPLICIT_WAIT) -> str:
         return self.find(element_selector, timeout).text
