@@ -10,12 +10,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name='easy-automation-test',
-    version='0.0.3.1',
+    version='0.0.4',
     author='jameszhang',
     author_email='18373230129@163.com',
     description='Easy to create a web, mobile or api automation test project',
     long_description=long_description,
     long_description_content_type='text/markdown',
+    keywords=['automation test', 'appium', 'web', 'mobile', 'api'],
     url="https://github.com/zhangjiapeng23/easy_automation_test",
     project_urls={
         "Bug Tracker": "https://github.com/zhangjiapeng23/easy_automation_test/issues"
@@ -23,7 +24,7 @@ setuptools.setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent"
+        "Operating System :: OS Independent",
     ],
     install_requires=[
         'requests>=2.26.0',
