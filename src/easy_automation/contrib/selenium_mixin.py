@@ -28,7 +28,7 @@ class SeleniumMixin:
         return WebDriverWait(self.driver, timeout=timeout)\
             .until(EC.presence_of_element_located(element_selector))
 
-    def finds(self, element_selector, timeout=EXPLICIT_WAIT) -> List:
+    def finds(self, element_selector, timeout=EXPLICIT_WAIT) -> List[WebElement]:
         """
         :param  timeout:
         :param element_selector:
@@ -63,6 +63,15 @@ class SeleniumMixin:
             elements = elements[_slice]
         for element in elements:
             element.click()
+
+    def get_element_text(self, element_selector, timeout=EXPLICIT_WAIT) -> str:
+        return self.find(element_selector, timeout).text
+
+    def get_elements_text(self, element_selector, timeout=EXPLICIT_WAIT, _slice=None) -> List[str]:
+        elements = self.finds(element_selector, timeout)
+        if _slice and isinstance(_slice, slice):
+            elements = elements[_slice]
+        return [ele.text for ele in elements]
 
     def send_value(self, element_selector, value, timeout=EXPLICIT_WAIT):
         self.find(element_selector, timeout).send_keys(value)
