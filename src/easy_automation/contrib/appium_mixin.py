@@ -52,10 +52,12 @@ class AppiumMixin:
         before_click_hook(self.driver)
         element.click()
 
+    @after_error_hook
     def click_position(self, position):
         before_click_hook(self.driver)
         self.driver.tap([position])
 
+    @after_error_hook
     def swipe(self, start_position: tuple, end_position: tuple):
         before_click_hook(self.driver)
         try:
@@ -79,6 +81,7 @@ class AppiumMixin:
             before_click_hook(self.driver)
             element.click()
 
+    @after_error_hook
     def send_value(self, element_selector, value, timeout=EXPLICIT_WAIT):
         self.find(element_selector, timeout).send_keys(value)
 
