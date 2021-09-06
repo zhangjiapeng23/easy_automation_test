@@ -10,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 
 from easy_automation.utils.custom_logging import Logs
+from easy_automation.contrib.after_error_hook import after_error_hook
 
 log = Logs(__name__)
 
@@ -17,6 +18,7 @@ log = Logs(__name__)
 class SeleniumMixin:
     EXPLICIT_WAIT = 8
 
+    @after_error_hook
     def find(self, element_selector, timeout=EXPLICIT_WAIT) -> WebElement:
         """
         :param timeout:
@@ -28,6 +30,7 @@ class SeleniumMixin:
         return WebDriverWait(self.driver, timeout=timeout)\
             .until(EC.presence_of_element_located(element_selector))
 
+    @after_error_hook
     def finds(self, element_selector, timeout=EXPLICIT_WAIT) -> List[WebElement]:
         """
         :param  timeout:
@@ -40,6 +43,7 @@ class SeleniumMixin:
         return WebDriverWait(self.driver, timeout=timeout)\
             .until(EC.presence_of_all_elements_located(element_selector))
 
+    @after_error_hook
     def click_element(self, element_selector, timeout=EXPLICIT_WAIT):
         """
         :param element_seletctor:
@@ -50,6 +54,7 @@ class SeleniumMixin:
             .until(EC.element_to_be_clickable(element_selector))
         element.click()
 
+    @after_error_hook
     def click_elements(self, element_selector, timeout=EXPLICIT_WAIT, _slice=None):
         """
         :param element_seletctor:
@@ -64,28 +69,38 @@ class SeleniumMixin:
         for element in elements:
             element.click()
 
+    @after_error_hook
     def get_element_text(self, element_selector, timeout=EXPLICIT_WAIT) -> str:
         return self.find(element_selector, timeout).text
 
+    @after_error_hook
     def get_elements_text(self, element_selector, timeout=EXPLICIT_WAIT, _slice=None) -> List[str]:
         elements = self.finds(element_selector, timeout)
         if _slice and isinstance(_slice, slice):
             elements = elements[_slice]
         return [ele.text for ele in elements]
 
+    @after_error_hook
     def send_value(self, element_selector, value, timeout=EXPLICIT_WAIT):
         self.find(element_selector, timeout).send_keys(value)
 
+    @after_error_hook
     def action_chain(self):
         return ActionChains(self.driver)
 
+    @after_error_hook
     def scroll_find(self, element_selector, timeout=EXPLICIT_WAIT) -> WebElement:
         element = WebDriverWait(self.driver, timeout=timeout).until(EC.presence_of_element_located(element_selector))
         self.driver.execute_script("arguments[0].scrollIntoView();", element)
         return element
 
+    @after_error_hook
     def scroll_click(self, element_selector, timeout=EXPLICIT_WAIT):
         self.scroll_find(element_selector, timeout).click()
+
+    def screenshot(self):
+        log.info('Get screenshot.')
+        return self.driver.get_screenshot_as_png()
 
     def _clickable_elements(self, element_selector, timeout=EXPLICIT_WAIT) -> WebElement:
         """

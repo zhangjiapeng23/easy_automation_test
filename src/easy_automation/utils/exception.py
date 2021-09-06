@@ -61,3 +61,13 @@ class PathFindError(Exception):
     def __str__(self):
         return "Can't find manage.py file, please make sure this file " \
                "under project root dir"
+
+
+class AssertFailed(Exception):
+
+    def __init__(self, msg, desc):
+        self._msg = msg if msg else ''
+        self._desc = desc
+
+    def __str__(self):
+        return self._msg + '\n' + self._desc
