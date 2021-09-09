@@ -3,6 +3,7 @@
 # @author: James Zhang
 # @data  : 2021/7/27
 from typing import List
+from contextlib import contextmanager
 
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
@@ -90,7 +91,8 @@ class SeleniumMixin:
 
     @after_error_hook
     def scroll_find(self, element_selector, timeout=EXPLICIT_WAIT) -> WebElement:
-        element = WebDriverWait(self.driver, timeout=timeout).until(EC.presence_of_element_located(element_selector))
+        element = WebDriverWait(self.driver, timeout=timeout)\
+            .until(EC.presence_of_element_located(element_selector))
         self.driver.execute_script("arguments[0].scrollIntoView();", element)
         return element
 
@@ -98,9 +100,45 @@ class SeleniumMixin:
     def scroll_click(self, element_selector, timeout=EXPLICIT_WAIT):
         self.scroll_find(element_selector, timeout).click()
 
+    @contextmanager
+    def switch_to_new_window_handle(self):
+        '''
+        when enter this context will auto switch driver to new open tab,
+        exist context will auto close this tab and switch driver back to origin tab.
+        :return:
+        '''
+        wait = WebDriverWait(self.driver, timeout=self.EXPLICIT_WAIT)
+        origin_window = self.driver.current_window_handle
+        wait.until(EC.number_of_windows_to_be(2))
+        for window_handle in self.driver.window_handles:
+            if window_handle != origin_window:
+                self.driver.switch_to.window(window_handle)
+                break
+        yield self
+        self.driver.switch_to.window(origin_window)
+
+    @contextmanager
+    def switch_to_iframe(self, element_select, timeout=EXPLICIT_WAIT):
+        if isinstance(element_select, WebElement):
+            iframe = element_select
+        else:
+            iframe = self.find(element_select, timeout)
+        self.driver.switch_to.frame(iframe)
+        yield self
+        self.driver.close()
+        self.driver.switch_to.default_content()
+
     def screenshot(self):
         log.info('Get screenshot.')
         return self.driver.get_screenshot_as_png()
+
+    def element_screenshot(self, element_selector, timeout=EXPLICIT_WAIT):
+        if isinstance(element_selector, WebElement):
+            element = element_selector
+        else:
+            element = self.find(element_selector, timeout)
+        log.info('Get screenshot.')
+        return element.screenshot_as_png()
 
     def _clickable_elements(self, element_selector, timeout=EXPLICIT_WAIT) -> WebElement:
         """
