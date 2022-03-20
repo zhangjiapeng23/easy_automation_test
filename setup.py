@@ -10,7 +10,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name='easy-automation-test',
-    version='0.0.4.6',
+    version='0.0.4.7',
     author='jameszhang',
     author_email='18373230129@163.com',
     description='Easy to create a web, mobile or api automation test project',
