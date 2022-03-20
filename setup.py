@@ -28,11 +28,11 @@ setuptools.setup(
     ],
     install_requires=[
         'requests>=2.26.0',
-        'selenium>=3.141.0',
+        'selenium>=4.1.3',
         'allure-pytest>=2.9.43',
         'PyYAML>=5.4.1',
         'Faker>=8.10.1',
-        'Appium-Python-Client>=1.2.0',
+        'Appium-Python-Client>=2.1.4',
         'pytest-xdist>=2.3.0'
     ],
     package_dir={"": "src"},

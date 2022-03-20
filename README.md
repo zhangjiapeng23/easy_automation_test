@@ -1,4 +1,4 @@
-##easy automation test
+#easy automation test
 
 This library is to help developer or tester write automation
  testcases faster and easier. Include web, api, Android and iOS.

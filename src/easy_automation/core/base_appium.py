@@ -33,7 +33,7 @@ class BaseAppium(ABC):
                 APPIUM_SERVER_URL = setting.APPIUM_SERVER_URL
                 command_executor = APPIUM_SERVER_URL
             except AttributeError:
-                raise  AppiumServerNotSet
+                raise AppiumServerNotSet
             finally:
                 if len(APPIUM_SERVER_URL) == 0:
                     raise AppiumServerUrlInvalid(APPIUM_SERVER_URL)
