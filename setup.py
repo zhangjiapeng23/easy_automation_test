@@ -10,7 +10,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name='easy-automation-test',
-    version='0.0.4.7',
+    version='0.0.4.8',
     author='jameszhang',
     author_email='18373230129@163.com',
     description='Easy to create a web, mobile or api automation test project',
@@ -28,7 +28,7 @@ setuptools.setup(
     ],
     install_requires=[
         'requests>=2.26.0',
-        'selenium>=4.1.3',
+        'selenium>=4.0.0',
         'allure-pytest>=2.9.43',
         'PyYAML>=5.4.1',
         'Faker>=8.10.1',
@@ -38,7 +38,7 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     include_package_data=True,
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     entry_points={
         'console_scripts': [
             'easy-automation=easy_automation.utils.command_parser:command_parser'
