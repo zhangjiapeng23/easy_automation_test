@@ -8,6 +8,7 @@ import yaml
 
 from easy_automation.utils.common import Singleton, FrozenJson, find_project_root_dir
 
+
 class YamlLoader(metaclass=Singleton):
     _yaml_file_loader = {}
 
