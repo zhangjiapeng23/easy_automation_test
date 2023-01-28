@@ -11,17 +11,15 @@ from easy_automation.utils.template_render import TemplateRender
 
 class TemplateCommand:
     action_template_map = {
-        'startWebProject': 'web_template',
-        'startApiProject': 'api_template',
-        'startAndroidProject': 'android_template',
-        'startIosProject': 'ios_template'
+        'startproj': 'proj_template',
+        'startwebapp': 'web_template',
+        'startapiapp': 'api_template',
     }
 
     action_project_folder_map = {
-        'startWebProject': '_web_test',
-        'startApiProject': '_api_test',
-        'startAndroidProject': '_Android_test',
-        'startIosProject': '_iOS_test',
+        'startproj': '_automation_test',
+        'startwebapp': '_web_test',
+        'startapiapp': '_api_test',
     }
 
     rewrite_template_suffixes = (
@@ -29,13 +27,13 @@ class TemplateCommand:
         ('.py-tpl', '.py'),
     )
 
-    def __init__(self, action, project_name):
+    def __init__(self, action, name):
         self.action = action
-        self.project_name = project_name
+        self.name = name
 
     def handle(self):
-        base_name = self.project_name
-        camel_case_name = ''.join([i.title() for i in self.project_name.split('_')])
+        base_name = self.name
+        camel_case_name = ''.join([i.title() for i in self.name.split('_')])
         project_folder_name = base_name + self.action_project_folder_map[self.action]
 
         top_dir = os.path.join(os.getcwd(), project_folder_name)
@@ -86,7 +84,7 @@ class TemplateCommand:
 
     @staticmethod
     def handle_template(template):
-        return os.path.join(easy_automation.__path__[0], 'project_templates', template)
+        return os.path.join(easy_automation.__path__[0], 'templates', template)
 
 
 

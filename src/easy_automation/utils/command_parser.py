@@ -10,16 +10,14 @@ from easy_automation.core.template_command import TemplateCommand
 
 def command_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('create_project',
+    parser.add_argument('startproj',
                         type=str,
-                        choices=('startWebProject', 'startApiProject', 'startAndroidProject', 'startIosProject'),
-                        help='select a kind of project to create: '
-                             'web_template, api_template, Android_template, iOS_template')
+                        help='Create a root directory of automation test project ')
     parser.add_argument('project_name',
                         type=str,
                         help='project folder name')
     args = parser.parse_args()
-    template_command = TemplateCommand(action=args.create_project, project_name=args.project_name)
+    template_command = TemplateCommand(action=args.startproj, name=args.project_name)
     template_command.handle()
 
 

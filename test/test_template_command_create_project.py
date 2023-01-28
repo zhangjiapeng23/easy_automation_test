@@ -9,7 +9,12 @@ from src.easy_automation.core.template_command import TemplateCommand
 class TestTemplateCreateProject:
 
     def test_create_project(self):
-        action = 'startAndroidProject'
+        action = 'startproj'
         project_name = 'test_project'
         template = TemplateCommand(action, project_name)
         template.handle()
+
+
+if __name__ == '__main__':
+    tester = TestTemplateCreateProject()
+    tester.test_create_project()

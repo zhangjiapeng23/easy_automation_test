@@ -22,7 +22,7 @@ class TemplateRender:
 
 
 if __name__ == '__main__':
-    with open('F:\\pythonProject\\easy_automation_test\\src\\easy_automation\\project_templates\\api_template\\project_api\\project_api.py-tpl', 'r',  encoding='utf-8') as fh:
+    with open('F:\\pythonProject\\easy_automation_test\\src\\easy_automation\\templates\\api_template\\project_api\\project_api.py-tpl', 'r',  encoding='utf-8') as fh:
         content = fh.read()
     test = TemplateRender(content)
     test.render(project_name='Feishu')
