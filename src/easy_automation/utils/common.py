@@ -8,7 +8,10 @@ import time
 from collections import abc
 from functools import wraps
 
+import pytest
+
 from .exception import PathFindError
+
 
 class Singleton(type):
 
@@ -94,3 +97,19 @@ def find_project_root_dir():
                 raise PathFindError
             else:
                 cur_dir = higher_dir
+
+
+def easy_parametrize(param):
+
+    def decorator(func):
+        keys, values, ids = param
+
+        @wraps(func)
+        @pytest.mark.parametrize(keys, values, ids=ids)
+        def wrap(self, *args, **kwargs):
+            return func(self, *args, **kwargs)
+
+        return wrap
+
+    return decorator
+
