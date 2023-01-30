@@ -5,9 +5,14 @@ import time
 from typing import List
 
 from easy_automation.utils.custom_logging import Logs
+from easy_automation.utils.config_loader import ConfigLoader
+
+# 装载全局配置和测试数据对象
+context: ConfigLoader = None
 
 log = Logs()
 root_dir = os.path.join(os.path.dirname(__file__), "..")
+
 
 def pytest_addoption(parser):
     # add run evn option
@@ -19,9 +24,11 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
-    env = config.getoption("--run_env")
+    global context
+    env = config.getoption("--env")
     app = config.getoption("--app")
     test_type = config.getoption("--type")
+    context = ConfigLoader(app, env, test_type)
 
 
 def pytest_collection_modifyitems(
@@ -74,4 +81,3 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     result_file = os.path.join(root_dir, 'result_summary.json')
     with open(result_file, 'w', encoding='utf-8') as f:
         json.dump(result, f)
-

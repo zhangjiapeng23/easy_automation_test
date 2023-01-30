@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+# @author: James Zhang
+# @data  : 2023/1/30
+
 import os.path
 
 from easy_automation.utils.common import find_project_root_dir
