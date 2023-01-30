@@ -9,6 +9,20 @@ from easy_automation.utils.custom_logging import Logs
 log = Logs()
 root_dir = os.path.join(os.path.dirname(__file__), "..")
 
+def pytest_addoption(parser):
+    # add run evn option
+    parser.addoption("--env", action="store", default="", help="指定测试运行环境")
+    # add app name option
+    parser.addoption("--app", action="store", required=True, help="指定测试APP")
+    # add test type option
+    parser.addoption("--type", action="store", required=True, choices=('web', 'api'), help="指定测试类型")
+
+
+def pytest_configure(config):
+    env = config.getoption("--run_env")
+    app = config.getoption("--app")
+    test_type = config.getoption("--type")
+
 
 def pytest_collection_modifyitems(
         session: "Session", config: "Config", items: List["Item"]) -> None:
