@@ -7,19 +7,32 @@ import importlib
 
 class Setting:
 
-    def __init__(self):
-        self.SETTING_MODULE = 'settings.settings'
-        _settings = importlib.import_module(self.SETTING_MODULE)
+    def __init__(self, settings_filename):
+        settings_package = 'settings'
+        settings_filename = f".{settings_filename}"
+        _settings = importlib.import_module(settings_filename, package=settings_package)
         for setting in dir(_settings):
             if setting.isupper():
                 value = getattr(_settings, setting)
                 setattr(self, setting, value)
 
-    def __repr__(self):
-        return '<%(cls)s "%(settings_module)s">' % {
-            'cls': self.__class__.__name__,
-            'settings_module': self.SETTING_MODULE,
-        }
+    def merge_from(self, other_settings):
+        if not (isinstance(other_settings, Setting)):
+            raise RuntimeError("merge object must be an instance of Setting")
+
+        for other_setting in dir(other_settings):
+            if other_setting.isupper() and other_setting not in dir(self):
+                value = getattr(other_settings, other_setting)
+                setattr(self, other_setting, value)
+
+    def merge_to(self, other_settings):
+        if not (isinstance(other_settings, Setting)):
+            raise RuntimeError("merge object must be an instance of Setting")
+
+        for other_setting in dir(other_settings):
+            if other_setting.isupper():
+                value = getattr(other_settings, other_setting)
+                setattr(self, other_setting, value)
 
 
-setting = Setting()
+
