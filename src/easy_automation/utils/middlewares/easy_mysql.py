@@ -5,7 +5,7 @@
 import pymysql
 
 from easy_automation.utils.custom_logging import Logs
-from easy_automation.utils.middleware.middleware_abs import MiddlewareABC
+from easy_automation.utils.middlewares.middleware_abs import MiddlewareABC
 
 log = Logs(log_name="mysql")
 

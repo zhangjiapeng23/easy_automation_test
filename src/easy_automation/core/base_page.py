@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-from ..utils.setting import setting
+from easy_automation.utils.loaders.setting import setting
 from ..utils.exception import BrowserNotSupport, SeleniumHubNotSet, SeleniumHubUrlInvalid
 
 

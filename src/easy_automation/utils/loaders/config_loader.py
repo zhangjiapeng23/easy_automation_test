@@ -6,8 +6,8 @@
 import os.path
 
 from easy_automation.utils.common import find_project_root_dir
-from easy_automation.utils.yaml_loader import YamlLoader
-from easy_automation.utils.setting import Setting
+from easy_automation.utils.loaders.yaml_loader import YamlLoader
+from easy_automation.utils.loaders.setting import Setting
 
 
 class ConfigLoader:
