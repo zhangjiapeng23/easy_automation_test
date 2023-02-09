@@ -18,15 +18,17 @@ class _MysqlConnector:
 
     def select_one(self, sql):
         with self.db.cursor(pymysql.cursors.DictCursor) as cur:
+            log.debug(f"execute sql: {sql}")
             cur.execute(sql)
             return cur.fetchone()
 
     def select_all(self, sql):
         with self.db.cursor(pymysql.cursors.DictCursor) as cur:
+            log.debug(f"execute sql: {sql}")
             cur.execute(sql)
             return cur.fetchall()
 
-    def close(self):
+    def _close_connect(self):
         log.debug(f"{self._connect} connect close")
         self.db.close()
 
@@ -46,21 +48,7 @@ class EasyMysql(MiddlewareABC):
     def _create_connect(self, db_name):
         connect = pymysql.connect(host=self.host, port=self.port, user=self.username, password=self.password,
                                   database=db_name, autocommit=self.autocommit)
-        print("初始化数据库连接")
         return _MysqlConnector(connect)
-
-    def select_one(self, sql):
-        log.debug(f"execute sql: {sql}")
-        return self.db.select_one(sql)
-
-    def select_all(self, sql):
-        log.debug(f"execute sql: {sql}")
-        return self.db.select_all(sql)
-
-    @classmethod
-    def close_all_connect(cls):
-        for conn in cls._DATABASE.values():
-            conn.close()
 
     @property
     def host(self):
@@ -82,13 +70,6 @@ class EasyMysql(MiddlewareABC):
     def autocommit(self):
         return self._autocommit
 
-    @autocommit.setter
-    def autocommit(self, value):
-        if (value is True) or (value is False):
-            self._autocommit = value
-        else:
-            raise ValueError("Should set 'True' or 'False'")
-
 
 if __name__ == '__main__':
     mysql = EasyMysql(host='pre-us.clxptq1z8dud.rds.cn-north-1.amazonaws.com.cn',
@@ -103,5 +84,6 @@ if __name__ == '__main__':
     print(res1)
     print(res2)
     print(res3)
+    MiddlewareABC.close_all_connect()
 
 

@@ -7,7 +7,7 @@ import os.path
 
 from easy_automation.utils.common import find_project_root_dir
 from easy_automation.utils.loaders.yaml_loader import YamlLoader
-from easy_automation.utils.loaders.setting import Setting
+from easy_automation.utils.loaders.setting_loader import SettingLoader
 
 
 class ConfigLoader:
@@ -30,8 +30,8 @@ class ConfigLoader:
         testdata_dir = os.path.join(root_dir, app_name, 'testdata', testdata_filename)
 
         # 初始化setting
-        origin_settings = Setting(origin_settings_filename)
-        settings = Setting(settings_filename)
+        origin_settings = SettingLoader(origin_settings_filename)
+        settings = SettingLoader(settings_filename)
         settings.merge_from(origin_settings)
         self._settings = _SettingsProxy(settings)
 

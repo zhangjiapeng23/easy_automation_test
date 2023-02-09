@@ -6,7 +6,7 @@
 import requests
 import os
 
-from easy_automation.utils.loaders.setting import setting
+from easy_automation.utils.loaders.setting_loader import setting
 from .exception import CommandError
 from .custom_logging import Logs
 from .common import find_project_root_dir

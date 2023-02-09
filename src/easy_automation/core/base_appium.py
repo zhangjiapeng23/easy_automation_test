@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 import os
 from appium.webdriver import Remote
 
-from easy_automation.utils.loaders.setting import setting
+from easy_automation.utils.loaders.setting_loader import setting
 from ..utils.exception import SeleniumHubNotSet, SeleniumHubUrlInvalid,\
     AppiumServerNotSet, AppiumServerUrlInvalid
 

@@ -8,7 +8,7 @@ import os
 import requests
 
 from .common import http_retry, find_project_root_dir
-from easy_automation.utils.loaders.setting import setting
+from easy_automation.utils.loaders.setting_loader import setting
 from .exception import CommandError
 from .custom_logging import Logs
 

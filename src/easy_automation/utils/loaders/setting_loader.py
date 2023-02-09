@@ -5,7 +5,7 @@
 import importlib
 
 
-class Setting:
+class SettingLoader:
 
     def __init__(self, settings_filename):
         settings_package = 'settings'
@@ -17,7 +17,7 @@ class Setting:
                 setattr(self, setting, value)
 
     def merge_from(self, other_settings):
-        if not (isinstance(other_settings, Setting)):
+        if not (isinstance(other_settings, SettingLoader)):
             raise RuntimeError("merge object must be an instance of Setting")
 
         for other_setting in dir(other_settings):
@@ -26,7 +26,7 @@ class Setting:
                 setattr(self, other_setting, value)
 
     def merge_to(self, other_settings):
-        if not (isinstance(other_settings, Setting)):
+        if not (isinstance(other_settings, SettingLoader)):
             raise RuntimeError("merge object must be an instance of Setting")
 
         for other_setting in dir(other_settings):
