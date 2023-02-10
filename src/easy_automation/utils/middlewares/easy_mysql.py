@@ -35,9 +35,9 @@ class _MysqlConnector:
 
 class EasyMysql(MiddlewareABC):
 
-    def __init__(self, host, prot, username, password, autocommit=True):
+    def __init__(self, host, port, username, password, autocommit=True):
         self._host = host
-        self._prot = prot
+        self._port = port
         self._username = username
         self._password = password
         self._autocommit = autocommit
@@ -56,7 +56,7 @@ class EasyMysql(MiddlewareABC):
 
     @property
     def port(self):
-        return self._prot
+        return self._port
 
     @property
     def username(self):

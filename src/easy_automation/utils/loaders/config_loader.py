@@ -8,6 +8,8 @@ import os.path
 from easy_automation.utils.common import find_project_root_dir
 from easy_automation.utils.loaders.yaml_loader import YamlLoader
 from easy_automation.utils.loaders.setting_loader import SettingLoader
+from easy_automation.utils.middlewares.easy_mysql import EasyMysql
+from easy_automation.utils.middlewares.easy_redis import EasyRedis
 
 
 class ConfigLoader:
@@ -57,12 +59,36 @@ class _SettingsProxy:
 
     def __init__(self, settings):
         self._settings = settings
+        middleware = self._settings.MIDDLEWARE
+
+        # 初始化mysql代理对象
+        if hasattr(middleware, 'mysql'):
+            host = middleware.mysql.host
+            port = middleware.mysql.port
+            username = middleware.mysql.username
+            password = middleware.mysql.password
+            self._mysql = EasyMysql(host=host, port=port, username=username, password=password)
+        else:
+            self._mysql = None
+
+        # 初始化redis代理对象
+        if hasattr(middleware, 'redis'):
+            host = middleware.redis.host
+            port = middleware.redis.port
+            password = middleware.redis.password
+            self._redis = EasyRedis(host=host, port=port, password=password)
+        else:
+            self._redis = None
 
     def get_mysql_connect(self, db_name):
-        pass
+        if self._mysql:
+            return self._mysql.get_connect(db_name)
+        raise RuntimeError("Not set mysql config")
 
     def get_redis_connect(self, db_name):
-        pass
+        if self._redis:
+            return self._redis.get_connect(db_name)
+        raise RuntimeError("Not set redis config")
 
     def __getitem__(self, item):
         return getattr(self._settings, item)

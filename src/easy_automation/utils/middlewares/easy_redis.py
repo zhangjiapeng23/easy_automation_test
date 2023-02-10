@@ -36,9 +36,9 @@ class _RedisConnector:
 
 class EasyRedis(MiddlewareABC):
 
-    def __init__(self, host, prot, password="", decode_responses=True):
+    def __init__(self, host, port, password="", decode_responses=True):
         self._host = host
-        self._prot = prot
+        self._port = port
         self._password = password
         self._decode_responses = decode_responses
 
@@ -56,7 +56,7 @@ class EasyRedis(MiddlewareABC):
 
     @property
     def port(self):
-        return self._prot
+        return self._port
 
     @property
     def password(self):
@@ -65,6 +65,7 @@ class EasyRedis(MiddlewareABC):
     @property
     def decode_responses(self):
         return self._decode_responses
+
 
 if __name__ == '__main__':
     r = EasyRedis(host='k8s-middlewa-dcus1red-e9aab31110-d4b6c6e8f6aae0bf.elb.cn-north-1.amazonaws.com.cn',
