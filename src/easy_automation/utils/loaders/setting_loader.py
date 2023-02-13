@@ -4,6 +4,8 @@
 # @data  : 2021/7/20
 import importlib
 
+from easy_automation.utils.common import FrozenJson
+
 
 class SettingLoader:
 
@@ -14,7 +16,7 @@ class SettingLoader:
         for setting in dir(_settings):
             if setting.isupper():
                 value = getattr(_settings, setting)
-                setattr(self, setting, value)
+                setattr(self, setting, FrozenJson(value))
 
     def merge_from(self, other_settings):
         if not (isinstance(other_settings, SettingLoader)):

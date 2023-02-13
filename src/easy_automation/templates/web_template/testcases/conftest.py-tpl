@@ -4,8 +4,10 @@ import re
 import time
 from typing import List
 
+import pytest
 from easy_automation.utils.custom_logging import Logs
-from easy_automation.utils.config_loader import ConfigLoader
+from easy_automation.utils.loaders.config_loader import ConfigLoader
+from easy_automation.utils.middlewares.middleware_abs import MiddlewareABC
 
 # 装载全局配置和测试数据对象
 context: ConfigLoader = None
@@ -29,6 +31,12 @@ def pytest_configure(config):
     app = config.getoption("--app")
     test_type = config.getoption("--type")
     context = ConfigLoader(app, env, test_type)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def disconnect_middleware_fixture():
+    yield
+    MiddlewareABC.close_all_connect()
 
 
 def pytest_collection_modifyitems(

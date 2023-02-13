@@ -8,8 +8,8 @@ import os.path
 from easy_automation.utils.common import find_project_root_dir
 from easy_automation.utils.loaders.yaml_loader import YamlLoader
 from easy_automation.utils.loaders.setting_loader import SettingLoader
-from easy_automation.utils.middlewares.easy_mysql import EasyMysql
-from easy_automation.utils.middlewares.easy_redis import EasyRedis
+from easy_automation.utils.middlewares.easy_mysql import EasyMysql, _MysqlConnector
+from easy_automation.utils.middlewares.easy_redis import EasyRedis, _RedisConnector
 
 
 class ConfigLoader:
@@ -80,12 +80,12 @@ class _SettingsProxy:
         else:
             self._redis = None
 
-    def get_mysql_connect(self, db_name):
+    def get_mysql_connect(self, db_name) -> _MysqlConnector:
         if self._mysql:
             return self._mysql.get_connect(db_name)
         raise RuntimeError("Not set mysql config")
 
-    def get_redis_connect(self, db_name):
+    def get_redis_connect(self, db_name) -> _RedisConnector:
         if self._redis:
             return self._redis.get_connect(db_name)
         raise RuntimeError("Not set redis config")
