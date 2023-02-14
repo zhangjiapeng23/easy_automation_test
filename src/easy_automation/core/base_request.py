@@ -2,6 +2,8 @@
 # -*- encoding: utf-8 -*-
 # @author: James Zhang
 # @data  : 2021/7/14
+import copy
+
 import requests
 
 from ..utils.custom_logging import Logs
@@ -9,11 +11,15 @@ from ..utils.custom_logging import Logs
 
 class RequestBase:
     log = Logs(__name__)
+    _session = requests.session()
+    _headers = {}
 
-    def __init__(self):
-        self._session = requests.session()
-
-    def send(self, method, url, *args, **kwargs):
+    def send(self, method, url, verify=False, *args, **kwargs):
         self.log.debug('{} {}'.format(method, url))
-        return self._session.request(method, url, *args, **kwargs)
+        return self._session.request(method, url, headers=self._headers, verify=verify, *args, **kwargs)
 
+    def set_headers(self, headers_dic: dict):
+        self._headers = copy.deepcopy(headers_dic)
+
+    def add_header(self, header_dic: dict):
+        self._headers.update(header_dic)

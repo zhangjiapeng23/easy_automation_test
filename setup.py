@@ -33,7 +33,8 @@ setuptools.setup(
         'PyYAML>=5.4.1',
         'Faker>=8.10.1',
         'Appium-Python-Client>=2.1.4',
-        'pytest-xdist>=2.3.0'
+        'pytest-xdist>=2.3.0',
+        'kubernetes>=25.3.0'
     ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),

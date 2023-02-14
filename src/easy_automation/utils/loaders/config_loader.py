@@ -8,6 +8,7 @@ import os.path
 from easy_automation.utils.common import find_project_root_dir
 from easy_automation.utils.loaders.yaml_loader import YamlLoader
 from easy_automation.utils.loaders.setting_loader import SettingLoader
+from easy_automation.utils.loaders.app_loader import AppLoader
 from easy_automation.utils.middlewares.easy_mysql import EasyMysql, _MysqlConnector
 from easy_automation.utils.middlewares.easy_redis import EasyRedis, _RedisConnector
 
@@ -35,7 +36,7 @@ class ConfigLoader:
         origin_settings = SettingLoader(origin_settings_filename)
         settings = SettingLoader(settings_filename)
         settings.merge_from(origin_settings)
-        self._settings = _SettingsProxy(settings)
+        self._settings = _SettingsProxy(env, settings)
 
         # 初始化testdata
         origin_testdata = YamlLoader(origin_testdata_dir)
@@ -51,15 +52,30 @@ class ConfigLoader:
     def settings(self):
         return self._settings
 
-    def api_url(self, path_name):
-        return self._settings['PROJECT_HOST'] + self.testdata.path(path_name)
+    def api_url(self, app, path_name):
+        if hasattr(self._settings.apps, app):
+            app_loader = getattr(self._settings.apps, app)
+            path = getattr(app_loader.path, path_name)
+            return self._settings['PROJECT_HOST'] + path
+        raise RuntimeError(f"Not find {app} project settings")
+
+    def api_url_ip(self, app, path_name):
+        if hasattr(self._settings.apps, app):
+            app_loader = getattr(self._settings.apps, app)
+            path = getattr(app_loader.path, path_name)
+            return app_loader.ip + path
+        raise RuntimeError(f"Not find {app} project settings")
 
 
 class _SettingsProxy:
 
-    def __init__(self, settings):
+    def __init__(self, env, settings):
         self._settings = settings
         middleware = self._settings.MIDDLEWARE
+        apps = self._settings.APPS
+
+        # 初始化注册app
+        self._app = AppLoader(apps, env)
 
         # 初始化mysql代理对象
         if hasattr(middleware, 'mysql'):
@@ -90,6 +106,10 @@ class _SettingsProxy:
             return self._redis.get_connect(db_name)
         raise RuntimeError("Not set redis config")
 
+    @property
+    def apps(self):
+        return self._app
+
     def __getitem__(self, item):
         return getattr(self._settings, item)
 
@@ -103,9 +123,6 @@ class _TestDataProxy:
 
     def case(self, case_name):
         pass
-
-    def path(self, path_name):
-        return getattr(self, "_path").get(path_name)
 
     def account(self, account_name):
         account = getattr(self, "_account").get(account_name)
