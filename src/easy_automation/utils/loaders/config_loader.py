@@ -11,6 +11,7 @@ from easy_automation.utils.loaders.setting_loader import SettingLoader
 from easy_automation.utils.loaders.app_loader import AppLoader
 from easy_automation.utils.middlewares.easy_mysql import EasyMysql, _MysqlConnector
 from easy_automation.utils.middlewares.easy_redis import EasyRedis, _RedisConnector
+from easy_automation.utils.custom_faker import CustomFaker
 
 
 class ConfigLoader:
@@ -129,6 +130,38 @@ class _TestDataProxy:
         account = getattr(self, "_account").get(account_name)
         return self._parse_data(account)
 
+    def fake(self, name):
+        faker = CustomFaker()
+        fake = getattr(self, '_fake').get(name)
+        if isinstance(fake, list):
+            data_values = []
+            ids = []
+            data_keys = ", ".join((k for k in fake[0].keys() if k != 'ids'))
+            tuple_value = []
+            for i in fake:
+                for k in i.keys():
+                    if k == 'ids':
+                        ids.append(i[k])
+                    else:
+                        # 通过配置的值去获取一个模拟值
+                        v = getattr(faker, i[k])
+                        if callable(v):
+                            v = v()
+                        tuple_value.append(v)
+            data_values.append(tuple(tuple_value))
+        else:
+            data_keys = ", ".join((k for k in fake.keys() if k != 'ids'))
+            tuple_value = []
+            for k in fake.keys():
+                if k != 'ids':
+                    v = getattr(faker, fake[k])
+                    if callable(v):
+                        v = v()
+                    tuple_value.append(v)
+            data_values = tuple(tuple_value)
+            ids = [fake[k] for k in fake.keys() if k == 'ids']
+        return data_keys, data_values, ids
+
     @staticmethod
     def _parse_data(data):
         if isinstance(data, list):
@@ -146,7 +179,7 @@ class _TestDataProxy:
         else:
             data_keys = ", ".join((k for k in data.keys() if k != 'ids'))
             data_values = [tuple(data[k] for k in data.keys() if k != 'ids')]
-            ids = [data[k] for k in data.values() if k == 'ids']
+            ids = [data[k] for k in data.keys() if k == 'ids']
         return data_keys, data_values, ids
 
     def _wrapper(self, _item):
