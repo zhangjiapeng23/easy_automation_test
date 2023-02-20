@@ -10,13 +10,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name='easy-automation-test',
-    version='0.0.5.0',
+    version='0.0.6.0',
     author='jameszhang',
     author_email='18373230129@163.com',
-    description='Easy to create a web, mobile or api automation test project',
+    description='Easy to create a web or api automation test project',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    keywords=['automation test', 'appium', 'web', 'mobile', 'api'],
+    keywords=['automation test', 'web', 'api'],
     url="https://github.com/zhangjiapeng23/easy_automation_test",
     project_urls={
         "Bug Tracker": "https://github.com/zhangjiapeng23/easy_automation_test/issues"
@@ -32,9 +32,12 @@ setuptools.setup(
         'allure-pytest>=2.12.0',
         'PyYAML>=5.4.1',
         'Faker>=8.10.1',
-        'Appium-Python-Client>=2.1.4',
         'pytest-xdist>=2.3.0',
-        'kubernetes>=25.3.0'
+        'kubernetes>=25.3.0',
+        'tornado>=6.2',
+        'redis>=4.5.1',
+        'pytest>=6.2.4',
+        'PyMySQL>=1.0.2'
     ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
