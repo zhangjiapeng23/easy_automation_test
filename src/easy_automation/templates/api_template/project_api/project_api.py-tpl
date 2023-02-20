@@ -6,6 +6,3 @@ class {{ project_name }}ServerBase(RequestBase):
     '''
     Define some common method for the project, like get access_token, set header...
     '''
-
-    def __init__(self):
-        super().__init__()
