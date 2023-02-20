@@ -6,20 +6,17 @@ import os.path
 
 from kubernetes import config, client
 
+from easy_automation.utils.custom_logging import Logs
 from easy_automation.utils.common import find_project_root_dir
 
 setattr(client.Configuration(), 'verify_ssl', False)
 
+log = Logs(log_name="k8s")
 
-class Kube:
 
-    def __init__(self, env):
-        conf_path = os.path.join(find_project_root_dir(), "settings", "k8s",  env)
-        config.load_kube_config(conf_path)
-        self._coreV1 = client.CoreV1Api()
-        self._appV1 = client.AppsV1Api()
+def get_pod_ip(self):
 
-    def get_pod_ip(self, namespace, deployment):
+    def wrapper(namespace, deployment):
         # 获取对应namespace 下的所有deployment
         deployments = self._appV1.list_namespaced_deployment(namespace=namespace).items
         deployment_obj = None
@@ -43,5 +40,27 @@ class Kube:
             # 组装pod的ip和port
             for p in pods:
                 ips.append(f"http://{p.status.pod_ip}:{port}")
-
         return ips
+
+    return wrapper
+
+
+def get_pod_id_error(*args, **kwargs):
+    #  未查找到对应环境的k8s配置文件，将IP地址设置为本地
+    return ['http://127.0.0.1']
+
+
+class Kube:
+
+    def __init__(self, env):
+        conf_path = os.path.join(find_project_root_dir(), "settings", "k8s",  env)
+        if os.path.exists(conf_path):
+            config.load_kube_config(conf_path)
+            self._coreV1 = client.CoreV1Api()
+            self._appV1 = client.AppsV1Api()
+            setattr(self, "get_pod_ip", get_pod_ip(self))
+        else:
+            log.warning(f"Under this path: {conf_path}, not find k8s config")
+            setattr(self, "get_pod_ip", get_pod_id_error)
+
+

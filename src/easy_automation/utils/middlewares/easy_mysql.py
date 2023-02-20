@@ -14,7 +14,7 @@ class _MysqlConnector:
 
     def __init__(self, connect: pymysql.Connect):
         self.db = connect
-        self._connect = "{} connector".format(connect.db)
+        self._connect = "{} connector".format(connect.db.decode('utf-8'))
 
     def select_one(self, sql):
         with self.db.cursor(pymysql.cursors.DictCursor) as cur:
@@ -73,7 +73,7 @@ class EasyMysql(MiddlewareABC):
 
 if __name__ == '__main__':
     mysql = EasyMysql(host='pre-us.clxptq1z8dud.rds.cn-north-1.amazonaws.com.cn',
-              prot=3306,
+              port=3306,
               username='QA',
               password="webull1688")
     c = mysql.get_connect("wl_auth")

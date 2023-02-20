@@ -19,5 +19,15 @@ MIDDLEWARE = {
     }
 }
 
+APPS = [
+    {
+        "name": "",
+        "namespace": "",
+        "deployment": "",
+        "path": {
+            "api_name": "/xxx/xxx",
+        }
+    }
+]
 
 
