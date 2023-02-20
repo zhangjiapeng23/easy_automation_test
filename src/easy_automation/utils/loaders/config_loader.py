@@ -122,25 +122,44 @@ class _TestDataProxy:
             setattr(self, f"_{key}", self._testdata.get(key))
 
     def case(self, case_name):
-        pass
+        case = getattr(self, "_case").get(case_name)
+        return self._parse_data(case)
 
     def account(self, account_name):
         account = getattr(self, "_account").get(account_name)
+        return self._parse_data(account)
 
-        if isinstance(account, list):
-            account_values = []
+    @staticmethod
+    def _parse_data(data):
+        if isinstance(data, list):
+            data_values = []
             ids = []
-            account_keys = ", ".join((k for k in account[0].keys() if k != 'ids'))
-            for i in account:
-                tuple_value = []
+            data_keys = ", ".join((k for k in data[0].keys() if k != 'ids'))
+            tuple_value = []
+            for i in data:
                 for k in i.keys():
                     if k == 'ids':
                         ids.append(i[k])
                     else:
                         tuple_value.append(i[k])
-            account_values.append(tuple(tuple_value))
+            data_values.append(tuple(tuple_value))
         else:
-            account_keys = ", ".join((k for k in account.keys() if k != 'ids'))
-            account_values = [tuple(account[k] for k in account.keys() if k != 'ids')]
-            ids = [account[k] for k in account.values() if k == 'ids']
-        return account_keys, account_values, ids
+            data_keys = ", ".join((k for k in data.keys() if k != 'ids'))
+            data_values = [tuple(data[k] for k in data.keys() if k != 'ids')]
+            ids = [data[k] for k in data.values() if k == 'ids']
+        return data_keys, data_values, ids
+
+    def _wrapper(self, _item):
+
+        def inner(name):
+            data = getattr(self, _item).get(name)
+            return self._parse_data(data)
+
+        return inner
+
+    def __getattr__(self, item):
+        _item = "_" + item
+        if hasattr(self, _item):
+            return self._wrapper(_item)
+
+        raise AttributeError(f"{self.__class__.__name__} does not hava '{item}' attribute.")
