@@ -1,2 +1,2 @@
 global-exclude __pycache__
-recursive-include src/easy_automation/templates *.py-tpl *.yml
+recursive-include src/easy_automation/templates *.py-tpl *.yaml *.yml pre

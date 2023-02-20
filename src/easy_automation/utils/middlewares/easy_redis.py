@@ -7,7 +7,7 @@ import redis
 from easy_automation.utils.custom_logging import Logs
 from easy_automation.utils.middlewares.middleware_abs import MiddlewareABC
 
-log = Logs(log_name="mysql")
+log = Logs(log_name="redis")
 
 
 class _RedisConnector:

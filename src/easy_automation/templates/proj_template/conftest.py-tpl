@@ -17,7 +17,7 @@ root_dir = os.path.join(os.path.dirname(__file__), "..")
 
 def pytest_addoption(parser):
     # add run evn option
-    parser.addoption("--env", action="store", default="", help="指定测试运行环境")
+    parser.addoption("--env", action="store", default="pre", help="指定测试运行环境")
     # add app name option
     parser.addoption("--app", action="store", required=True, help="指定测试APP")
     # add test type option

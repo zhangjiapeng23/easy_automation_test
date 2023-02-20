@@ -23,3 +23,6 @@ class RequestBase:
 
     def add_header(self, header_dic: dict):
         self._headers.update(header_dic)
+
+    def modify_header(self, key, value):
+        self._headers[key] = value

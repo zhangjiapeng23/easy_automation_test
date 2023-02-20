@@ -119,8 +119,9 @@ class _TestDataProxy:
 
     def __init__(self, testdata):
         self._testdata = testdata
-        for key in self._testdata.keys():
-            setattr(self, f"_{key}", self._testdata.get(key))
+        if self._testdata:
+            for key in self._testdata.keys():
+                setattr(self, f"_{key}", self._testdata.get(key))
 
     def case(self, case_name):
         case = getattr(self, "_case").get(case_name)

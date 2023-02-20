@@ -45,9 +45,10 @@ class YamlLoader(metaclass=Singleton):
         if not (isinstance(other_yaml_loader, YamlLoader)):
             raise RuntimeError("merge object must be an instance of YamlLoader")
 
-        for other_key in other_yaml_loader._yaml_loader.keys():
-            if other_key not in self._yaml_loader.keys():
-                self._yaml_loader[other_key] = other_yaml_loader._yaml_loader.get(other_key)
+        if other_yaml_loader._yaml_loader:
+            for other_key in other_yaml_loader._yaml_loader.keys():
+                if other_key not in self._yaml_loader.keys():
+                    self._yaml_loader[other_key] = other_yaml_loader._yaml_loader.get(other_key)
 
         self._data = FrozenJson(self._yaml_loader)
 
@@ -55,8 +56,9 @@ class YamlLoader(metaclass=Singleton):
         if not (isinstance(other_yaml_loader, YamlLoader)):
             raise RuntimeError("merge object must be an instance of YamlLoader")
 
-        for other_key in other_yaml_loader._yaml_loader.keys():
-            self._yaml_loader[other_key] = other_yaml_loader._yaml_loader.get(other_key)
+        if other_yaml_loader._yaml_loader:
+            for other_key in other_yaml_loader._yaml_loader.keys():
+                self._yaml_loader[other_key] = other_yaml_loader._yaml_loader.get(other_key)
 
         self._data = FrozenJson(self._yaml_loader)
 

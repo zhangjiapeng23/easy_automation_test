@@ -73,7 +73,7 @@ class TemplateCommand:
                         new_path = new_path[:-len(old_suffix)] + new_suffix
                         break
 
-                if new_path.endswith(('.py', '.yml')):
+                if new_path.endswith(('.py', '.yml', '.yaml')):
                     with open(old_path, 'r', encoding='utf-8') as template_file:
                         content = template_file.read()
                         template_render = TemplateRender(content)
