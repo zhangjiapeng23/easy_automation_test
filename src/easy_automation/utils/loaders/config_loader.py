@@ -67,6 +67,14 @@ class ConfigLoader:
             return app_loader.ip + path
         raise RuntimeError(f"Not find {app} project settings")
 
+    def api_url_custom_host(self, app, path_name, host):
+        if hasattr(self._settings.apps, app):
+            app_loader = getattr(self._settings.apps, app)
+            path = getattr(app_loader.path, path_name)
+            return host + path
+        raise RuntimeError(f"Not find {app} project settings")
+
+
 
 class _SettingsProxy:
 
@@ -138,8 +146,8 @@ class _TestDataProxy:
             data_values = []
             ids = []
             data_keys = ", ".join((k for k in fake[0].keys() if k != 'ids'))
-            tuple_value = []
             for i in fake:
+                tuple_value = []
                 for k in i.keys():
                     if k == 'ids':
                         ids.append(i[k])
@@ -149,18 +157,30 @@ class _TestDataProxy:
                         if callable(v):
                             v = v()
                         tuple_value.append(v)
-            data_values.append(tuple(tuple_value))
+                # 多个值时返回tuple, 一个直接返回
+                if len(tuple_value) > 1:
+                    value = tuple(tuple_value)
+                else:
+                    value = tuple_value[0]
+                data_values.append(value)
         else:
             data_keys = ", ".join((k for k in fake.keys() if k != 'ids'))
             tuple_value = []
+            ids = []
             for k in fake.keys():
-                if k != 'ids':
+                if k == 'ids':
+                    ids.append(fake[k])
+                else:
                     v = getattr(faker, fake[k])
                     if callable(v):
                         v = v()
                     tuple_value.append(v)
-            data_values = tuple(tuple_value)
-            ids = [fake[k] for k in fake.keys() if k == 'ids']
+            # 多个值时返回tuple, 一个直接返回
+            if len(tuple_value) > 1:
+                value = tuple(tuple_value)
+            else:
+                value = tuple_value[0]
+            data_values = value
         return data_keys, data_values, ids
 
     @staticmethod
@@ -169,18 +189,34 @@ class _TestDataProxy:
             data_values = []
             ids = []
             data_keys = ", ".join((k for k in data[0].keys() if k != 'ids'))
-            tuple_value = []
             for i in data:
+                tuple_value = []
                 for k in i.keys():
                     if k == 'ids':
                         ids.append(i[k])
                     else:
                         tuple_value.append(i[k])
-            data_values.append(tuple(tuple_value))
+                # 多个值时返回tuple, 一个直接返回
+                if len(tuple_value) > 1:
+                    value = tuple(tuple_value)
+                else:
+                    value = tuple_value[0]
+                data_values.append(value)
         else:
             data_keys = ", ".join((k for k in data.keys() if k != 'ids'))
-            data_values = [tuple(data[k] for k in data.keys() if k != 'ids')]
-            ids = [data[k] for k in data.keys() if k == 'ids']
+            tuple_value = []
+            ids = []
+            for k in data.keys():
+                if k == 'ids':
+                    ids.append(data[k])
+                else:
+                    tuple_value.append(data[k])
+            # 多个值时返回tuple, 一个直接返回
+            if len(tuple_value) > 1:
+                value = tuple(tuple_value)
+            else:
+                value = tuple_value[0]
+            data_values = value
         return data_keys, data_values, ids
 
     def _wrapper(self, _item):

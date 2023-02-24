@@ -28,6 +28,11 @@ class _MysqlConnector:
             cur.execute(sql)
             return cur.fetchall()
 
+    def execute(self, sql):
+        with self.db.cursor(pymysql.cursors.DictCursor) as cur:
+            log.debug(f"execute sql: {sql}")
+            return cur.execute(sql)
+
     def _close_connect(self):
         log.debug(f"{self._connect} connect close")
         self.db.close()

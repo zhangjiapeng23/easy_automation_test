@@ -22,7 +22,11 @@ class _RedisConnector:
 
     def set(self, name, value, ex=None, px=None, nx=False, xx=False):
         log.debug(f"set key {name} {value}")
-        return self.db.set(name=name, value=value, ex=ex, px=px, nx=nx)
+        return self.db.set(name=name, value=value, ex=ex, px=px, nx=nx, xx=xx)
+
+    def delete(self, name):
+        log.debug(f"delete key {name}")
+        return self.db.delete(name)
 
     def __getattr__(self, item):
         if hasattr(self.db, item):

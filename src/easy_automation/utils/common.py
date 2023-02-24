@@ -99,7 +99,7 @@ def find_project_root_dir():
                 cur_dir = higher_dir
 
 
-def easy_parametrize(param):
+def _easy_parametrize(param):
 
     def decorator(func):
         keys, values, ids = param
@@ -112,4 +112,61 @@ def easy_parametrize(param):
         return wrap
 
     return decorator
+
+
+class easy_parametrize:
+
+    def __init__(self, *params):
+        self.keys = []
+        self.values = []
+        self.ids = []
+
+        # 递归传入的列表参数，返回笛卡尔集
+        def recur(keys, values, ids, cur_keys: list, cur_values: list, cur_ids: list, n):
+            if n == len(params):
+                if len(keys) == 0:
+                    # keys 只需一次即可确定
+                    keys.extend(cur_keys)
+                if len(cur_values) > 1:
+                    _new = []
+                    # 多组值时合并为一个扁平序列，如：[(1, 2), (a, b)] => [1, 2, a, b]
+                    for v in cur_values:
+                        for _v in v:
+                            _new.append(_v)
+                    values.append(tuple(_new))
+                else:
+                    _v = cur_values[0]
+                    # 区分是 (a,)和(a, b), 为 （a,) 直接返回 a
+                    if len(_v) == 1:
+                        _v = _v[0]
+                    values.append(_v)
+                ids.append("_".join(cur_ids))
+            else:
+                param = params[n]
+                _key, _values, _ids = param
+                for _value, _id in zip(_values, _ids):
+                    cur_keys.append(_key)
+                    cur_values.append(_value)
+                    cur_ids.append(_id)
+                    recur(keys, values, ids, cur_keys, cur_values, cur_ids, n+1)
+                    cur_keys.pop()
+                    cur_values.pop()
+                    cur_ids.pop()
+
+        cur_keys = []
+        cur_values = []
+        cur_ids = []
+        recur(self.keys, self.values, self.ids, cur_keys, cur_values, cur_ids, 0)
+
+    def __call__(self, func):
+        keys = ",".join(self.keys)
+        values = self.values
+        ids = self.ids
+
+        @wraps(func)
+        @pytest.mark.parametrize(keys, values, ids=ids)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        return wrapper
 
