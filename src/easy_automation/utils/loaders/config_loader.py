@@ -158,11 +158,11 @@ class _TestDataProxy:
                             v = v()
                         tuple_value.append(v)
                 # 多个值时返回tuple, 一个直接返回
-                if len(tuple_value) > 1:
-                    value = tuple(tuple_value)
-                else:
-                    value = tuple_value[0]
-                data_values.append(value)
+                # if len(tuple_value) > 1:
+                #     value = tuple(tuple_value)
+                # else:
+                #     value = tuple_value[0]
+                data_values.append(tuple(tuple_value))
         else:
             data_keys = ", ".join((k for k in fake.keys() if k != 'ids'))
             tuple_value = []
@@ -176,11 +176,11 @@ class _TestDataProxy:
                         v = v()
                     tuple_value.append(v)
             # 多个值时返回tuple, 一个直接返回
-            if len(tuple_value) > 1:
-                value = tuple(tuple_value)
-            else:
-                value = tuple_value[0]
-            data_values = value
+            # if len(tuple_value) > 1:
+            #     value = tuple(tuple_value)
+            # else:
+            #     value = tuple_value[0]
+            data_values = tuple(tuple_value)
         return data_keys, data_values, ids
 
     @staticmethod
@@ -197,11 +197,11 @@ class _TestDataProxy:
                     else:
                         tuple_value.append(i[k])
                 # 多个值时返回tuple, 一个直接返回
-                if len(tuple_value) > 1:
-                    value = tuple(tuple_value)
-                else:
-                    value = tuple_value[0]
-                data_values.append(value)
+                # if len(tuple_value) > 1:
+                #     value = tuple(tuple_value)
+                # else:
+                #     value = tuple_value[0]
+                data_values.append(tuple(tuple_value))
         else:
             data_keys = ", ".join((k for k in data.keys() if k != 'ids'))
             tuple_value = []
@@ -212,11 +212,11 @@ class _TestDataProxy:
                 else:
                     tuple_value.append(data[k])
             # 多个值时返回tuple, 一个直接返回
-            if len(tuple_value) > 1:
-                value = tuple(tuple_value)
-            else:
-                value = tuple_value[0]
-            data_values = value
+            # if len(tuple_value) > 1:
+            #     value = tuple(tuple_value)
+            # else:
+            #     value = tuple_value[0]
+            data_values = tuple(tuple_value)
         return data_keys, data_values, ids
 
     def _wrapper(self, _item):
