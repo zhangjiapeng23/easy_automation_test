@@ -26,3 +26,7 @@ class RequestBase:
 
     def modify_header(self, key, value):
         self._headers[key] = value
+
+    def delete_header(self, key):
+        if key in self._headers.keys():
+            self._headers.pop(key)
