@@ -16,22 +16,40 @@ class _MysqlConnector:
         self.db = connect
         self._connect = "{} connector".format(connect.db.decode('utf-8'))
 
-    def select_one(self, sql):
+    def select_one(self, sql, args=None):
         with self.db.cursor(pymysql.cursors.DictCursor) as cur:
-            log.debug(f"execute sql: {sql}")
-            cur.execute(sql)
+            if (args):
+                log.debug(f"execute sql: {sql % args}")
+            else:
+                log.debug(f"execute sql: {sql}")
+            cur.execute(sql, args)
             return cur.fetchone()
 
-    def select_all(self, sql):
+    def select_all(self, sql, args=None):
         with self.db.cursor(pymysql.cursors.DictCursor) as cur:
-            log.debug(f"execute sql: {sql}")
-            cur.execute(sql)
+            if (args):
+                log.debug(f"execute sql: {sql % args}")
+            else:
+                log.debug(f"execute sql: {sql}")
+            cur.execute(sql, args)
             return cur.fetchall()
 
-    def execute(self, sql):
+    def select_all_tuple(self, sql, args=None):
+        with self.db.cursor() as cur:
+            if (args):
+                log.debug(f"execute sql: {sql % args}")
+            else:
+                log.debug(f"execute sql: {sql}")
+            cur.execute(sql, args)
+            return cur.fetchall()
+
+    def execute(self, sql, args=None):
         with self.db.cursor(pymysql.cursors.DictCursor) as cur:
-            log.debug(f"execute sql: {sql}")
-            return cur.execute(sql)
+            if (args):
+                log.debug(f"execute sql: {sql % args}")
+            else:
+                log.debug(f"execute sql: {sql}")
+            return cur.execute(sql, args)
 
     def _close_connect(self):
         log.debug(f"{self._connect} connect close")
