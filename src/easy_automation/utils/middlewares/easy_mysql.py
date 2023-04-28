@@ -18,7 +18,7 @@ class _MysqlConnector:
 
     def select_one(self, sql, args=None):
         with self.db.cursor(pymysql.cursors.DictCursor) as cur:
-            if (args):
+            if args:
                 log.debug(f"execute sql: {sql % args}")
             else:
                 log.debug(f"execute sql: {sql}")
@@ -27,7 +27,7 @@ class _MysqlConnector:
 
     def select_all(self, sql, args=None):
         with self.db.cursor(pymysql.cursors.DictCursor) as cur:
-            if (args):
+            if args:
                 log.debug(f"execute sql: {sql % args}")
             else:
                 log.debug(f"execute sql: {sql}")
@@ -36,7 +36,7 @@ class _MysqlConnector:
 
     def select_all_tuple(self, sql, args=None):
         with self.db.cursor() as cur:
-            if (args):
+            if args:
                 log.debug(f"execute sql: {sql % args}")
             else:
                 log.debug(f"execute sql: {sql}")
@@ -45,7 +45,7 @@ class _MysqlConnector:
 
     def execute(self, sql, args=None):
         with self.db.cursor(pymysql.cursors.DictCursor) as cur:
-            if (args):
+            if args:
                 log.debug(f"execute sql: {sql % args}")
             else:
                 log.debug(f"execute sql: {sql}")
