@@ -27,9 +27,16 @@ def get_pod_ip(self):
                 break
         if deployment_obj:
             # 查出对应的端口号
-            port = deployment_obj.spec.template.spec.containers[0].ports[0].container_port
-            labels = ""
+            env_vars = deployment_obj.spec.template.spec.containers[0].env
+            for var in env_vars:
+                print(var)
+                if var.name == 'SERVER_PORT':
+                    port = var.value
+                    break
+            else:
+                port = '9083'
             # 查出对应deployment的match_labels
+            labels = ""
             for k, v in deployment_obj.spec.selector.match_labels.items():
                 if labels:
                     labels += ","
