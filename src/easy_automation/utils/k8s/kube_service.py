@@ -29,7 +29,6 @@ def get_pod_ip(self):
             # 查出对应的端口号
             env_vars = deployment_obj.spec.template.spec.containers[0].env
             for var in env_vars:
-                print(var)
                 if var.name == 'SERVER_PORT':
                     port = var.value
                     break
