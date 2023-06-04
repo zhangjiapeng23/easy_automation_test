@@ -23,7 +23,8 @@ class _RedisConnector:
     def get_or_default(self, name,  default):
         v = self.get(name)
         if not v:
-            return default
+            v = default
+        return v
 
     def set(self, name, value, ex=None, px=None, nx=False, xx=False):
         log.debug(f"set key {name} {value}")
