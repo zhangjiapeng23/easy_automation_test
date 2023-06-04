@@ -20,6 +20,11 @@ class _RedisConnector:
         log.debug(f"get key: {name}")
         return self.db.get(name)
 
+    def get_or_default(self, name,  default):
+        v = self.get(name)
+        if not v:
+            return default
+
     def set(self, name, value, ex=None, px=None, nx=False, xx=False):
         log.debug(f"set key {name} {value}")
         return self.db.set(name=name, value=value, ex=ex, px=px, nx=nx, xx=xx)
