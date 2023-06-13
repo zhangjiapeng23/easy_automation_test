@@ -30,11 +30,11 @@ def pytest_configure(config):
     app = config.getoption("--app")
     test_type = config.getoption("--type")
     context = ConfigLoader(app, env, test_type)
+    # 添加清理任务：关闭中间件连接
+    config.add_cleanup(disconnect_middleware)
 
 
-@pytest.fixture(autouse=True, scope="session")
-def disconnect_middleware_fixture():
-    yield
+def disconnect_middleware():
     MiddlewareABC.close_all_connect()
 
 
