@@ -57,6 +57,8 @@ class ConfigLoader:
         if hasattr(self._settings.apps, app):
             app_loader = getattr(self._settings.apps, app)
             path = getattr(app_loader.path, path_name)
+            if hasattr(app_loader, 'host'):
+                return getattr(app_loader, 'host') + path
             return self._settings['PROJECT_HOST'] + path
         raise RuntimeError(f"Not find {app} project settings")
 
