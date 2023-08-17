@@ -40,6 +40,7 @@ class ConfigLoader:
 
         # 初始化testdata
         origin_testdata = YamlLoader(origin_testdata_dir)
+        setattr(self._testdata, 'testdata', _TestDataProxy(origin_testdata))
         testdata_filename_dict = {}
         for _, _, files in os.walk(testdata_dir):
             for file in files:
