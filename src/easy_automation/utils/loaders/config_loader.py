@@ -24,14 +24,13 @@ class ConfigLoader:
         testdata_filename = "testdata.yaml"
         settings_filename = "settings"
         root_dir = find_project_root_dir()
+        self._testdata = _TestData()
 
         origin_testdata_dir = os.path.join(root_dir, app_name, 'testdata', testdata_filename)
         origin_settings_filename = settings_filename
 
-        if env:
-            testdata_filename = f"{env}_{testdata_filename}"
-            settings_filename = f"{env}_{settings_filename}"
-        testdata_dir = os.path.join(root_dir, app_name, 'testdata', testdata_filename)
+        settings_filename = f"{env}_{settings_filename}"
+        testdata_dir = os.path.join(root_dir, app_name, 'testdata', f"{env}")
 
         # 初始化setting
         origin_settings = SettingLoader(origin_settings_filename)
@@ -41,9 +40,15 @@ class ConfigLoader:
 
         # 初始化testdata
         origin_testdata = YamlLoader(origin_testdata_dir)
-        testdata = YamlLoader(testdata_dir)
-        testdata.merge_from(origin_testdata)
-        self._testdata = _TestDataProxy(testdata)
+        testdata_filename_dict = {}
+        for _, _, files in os.walk(testdata_dir):
+            for file in files:
+                file_name = file.split(".")[0]
+                testdata_filename_dict[file_name] = os.path.join(testdata_dir, file)
+        for k, v in testdata_filename_dict.items():
+            testdata = YamlLoader(v)
+            testdata.merge_from(origin_testdata)
+            setattr(self._testdata, k,  _TestDataProxy(testdata))
 
     @property
     def testdata(self):
@@ -215,3 +220,8 @@ class _TestDataProxy:
             return self._wrapper(_item)
 
         raise AttributeError(f"{self.__class__.__name__} does not hava '{item}' attribute.")
+
+
+class _TestData:
+    pass
+

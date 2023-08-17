@@ -14,7 +14,7 @@ class YamlLoader(metaclass=Singleton):
 
     def __init__(self, yaml_file: str):
         '''
-        yaml_file 需传递从app module下到testdata.yml的全路径，如 /am_api_test/testdata/pre_testdata.yml
+        yaml_file 需传递从app module下到testdata.yml的全路径，如 /am_api_test/testdata/testdata.yml
         :param yaml_file:
         '''
         yaml_file = os.path.join(find_project_root_dir(), yaml_file)
