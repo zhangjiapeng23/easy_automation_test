@@ -30,3 +30,6 @@ class RequestBase:
     def delete_header(self, key):
         if key in self._headers.keys():
             self._headers.pop(key)
+
+    def clear_header(self):
+        self._headers.clear()
