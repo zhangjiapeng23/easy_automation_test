@@ -2,6 +2,10 @@
 # -*- encoding: utf-8 -*-
 # @author: James Zhang
 # @data  : 2021/7/19
+import hashlib
+import socket
+import threading
+import uuid
 import keyword
 import os
 import time
@@ -170,3 +174,29 @@ class easy_parametrize:
 
         return wrapper
 
+
+def md5(*args):
+    m = hashlib.md5()
+    for arg in args:
+        if not isinstance(arg, bytes):
+            if not isinstance(arg, str):
+                arg = repr(arg)
+        arg = arg.encode('utf-8')
+        m.update(arg)
+    return m.hexdigest()
+
+
+def uuid4():
+    return str(uuid.uuid4())
+
+
+def now():
+    return int(round(1000 * time.time()))
+
+
+def thread_tag():
+    return f"{os.getpid()}-{threading.current_thread().name}"
+
+
+def host_tag():
+    return socket.gethostname()

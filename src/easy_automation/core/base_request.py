@@ -15,7 +15,12 @@ class RequestBase:
     _headers = {}
 
     def send(self, method, url, verify=False, *args, **kwargs):
-        self.log.debug('{} {}'.format(method, url))
+        params = ""
+        for k, v in kwargs.items():
+            if params:
+                params += ", "
+            params += f"{k}={v}"
+        self.log.debug('{} {} {}'.format(method, url, params))
         return self._session.request(method, url, headers=self._headers, verify=verify, *args, **kwargs)
 
     def set_headers(self, headers_dic: dict):
