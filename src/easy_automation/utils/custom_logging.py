@@ -28,7 +28,8 @@ class Logs:
             if not os.path.exists(logs_dir):
                 os.mkdir(logs_dir)
             log_file = os.path.join(logs_dir, 'log.log')
-            fh = logging.handlers.RotatingFileHandler(filename=log_file, mode='a', maxBytes=8 * 1024 * 20)
+            fh = logging.handlers.RotatingFileHandler(filename=log_file, mode='a', maxBytes=8 * 1024 * 20,
+                                                      encoding="utf-8")
             fh.setFormatter(formatter)
             fh.setLevel(logging.DEBUG)
 
