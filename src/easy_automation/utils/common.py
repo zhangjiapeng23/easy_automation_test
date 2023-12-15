@@ -200,3 +200,18 @@ def thread_tag():
 
 def host_tag():
     return socket.gethostname()
+
+
+class TearDown:
+
+    def __init__(self, func, *args, **kwargs):
+        self._func = func
+        self._args = args
+        self.__kwargs = kwargs
+
+    def __enter__(self):
+        return
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._func(*self._args, **self.__kwargs)
+        return False

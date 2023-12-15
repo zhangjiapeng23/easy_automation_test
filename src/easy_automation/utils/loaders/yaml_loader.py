@@ -68,6 +68,8 @@ class YamlLoader(metaclass=Singleton):
     def __getattr__(self, item):
         if hasattr(self._yaml_loader, item):
             return getattr(self._yaml_loader, item)
+        if item == "keys":
+            return lambda :[]
 
         raise AttributeError(f"{self.__class__.__name__} does not hava '{item}' attribute.")
 
