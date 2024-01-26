@@ -9,7 +9,7 @@ from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from easy_automation.utils.loaders.setting_loader import setting
-from ..utils.exception import BrowserNotSupport, SeleniumHubNotSet, SeleniumHubUrlInvalid
+from easy_automation.utils.exception import BrowserNotSupport, SeleniumHubNotSet, SeleniumHubUrlInvalid
 
 
 class BasePage(ABC):

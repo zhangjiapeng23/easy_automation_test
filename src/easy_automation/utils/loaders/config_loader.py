@@ -19,12 +19,20 @@ class ConfigLoader:
     加载对应环境，app的 setting 和 testdata 数据
     """
 
-    def __init__(self, app, env, test_type):
+    def __init__(self, app=None, env=None, test_type=None):
+        self._testdata = _TestData()
+        self._settings = None
+        if all((app, env, test_type)):
+            self._init(app, env, test_type)
+
+    def reload_init(self, app, env, test_type):
+        self._init(app, env, test_type)
+
+    def _init(self, app, env, test_type):
         app_name = f"{app}_{test_type}_test"
         testdata_filename = "testdata.yaml"
         settings_filename = "settings"
         root_dir = find_project_root_dir()
-        self._testdata = _TestData()
 
         origin_testdata_dir = os.path.join(root_dir, app_name, 'testdata', testdata_filename)
         origin_settings_filename = settings_filename
@@ -49,7 +57,7 @@ class ConfigLoader:
         for k, v in testdata_filename_dict.items():
             testdata = YamlLoader(v)
             testdata.merge_from(origin_testdata)
-            setattr(self._testdata, k,  _TestDataProxy(testdata))
+            setattr(self._testdata, k, _TestDataProxy(testdata))
 
     @property
     def testdata(self):

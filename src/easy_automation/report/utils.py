@@ -8,14 +8,18 @@ from traceback import format_exception_only
 import string
 
 import pytest
+import platform
 
-from easy_automation.report.model import Status, StatusDetails,
+from easy_automation.report.model import Status, StatusDetails
 from easy_automation.utils.common import md5
+from easy_automation.report.types import LabelType
 
 
 EASY_DESCRIPTION_MARK = 'easy_description'
 EASY_DESCRIPTION_HTML_MARK = 'east_description_html'
 EASY_LABEL_MARK = 'easy_label'
+EASY_LINK_MARk = 'easy_link'
+
 EASY_UNIQUE_LABELS = [
     LabelType.SEVERITY,
     LabelType.FRAMEWORK,
@@ -160,7 +164,7 @@ def easy_description(item):
 
 
 def easy_description_html(item):
-    return get_marker_value(item, EAST_DESCRIPTION_HTML_MARK)
+    return get_marker_value(item, EASY_DESCRIPTION_HTML_MARK)
 
 
 def easy_title(item):
@@ -199,7 +203,15 @@ def easy_labels(item):
     labels = set()
     for mark in item.iter_markers(name=EASY_LABEL_MARK):
         label_type = mark.kwargs["label_type"]
-        if label_type in A
+        if label_type in EASY_UNIQUE_LABELS:
+            if label_type not in unique_labels.keys():
+                unique_labels[label_type] = mark.args[0]
+        else:
+            for arg in mark.args:
+                labels.add((label_type, arg))
+    for k, v in unique_labels.items():
+        labels.add((k, v))
+    return labels
 
 
 def easy_full_name(item: pytest.Item):
@@ -219,3 +231,66 @@ def get_history_id(full_name, parameters, original_values):
                    ),
                    key=lambda p: p.name
                )))
+
+def pytest_markers(item):
+    for keyword in item.keywords.keys():
+        if any([keyword.startswith('allure_'), keyword == 'parametrize']):
+            continue
+        marker = item.get_closest_marker(keyword)
+        if marker is None:
+            continue
+
+        yield mark_to_str(marker)
+
+
+def mark_to_str(marker):
+    args = [represent(arg) for arg in marker.args]
+    kwargs = [f'{key}={represent(value)}' for key, value in marker.kwargs.items()]
+    if marker.name in ('filterwarnings', 'skip', 'skipif', 'xfail', 'usefixtures', 'tryfirst', 'trylast'):
+        markstr = f'@pytest.mark.{marker.name}'
+    else:
+        markstr = str(marker.name)
+    if args or kwargs:
+        parameters = ', '.join(args + kwargs)
+        markstr = f'{markstr}({parameters})'
+    return markstr
+
+
+def platform_label():
+    major_version, *_ = platform.python_version_tuple()
+    implementation = platform.python_implementation().lower()
+    return f'{implementation}{major_version}'
+
+
+def easy_package(item):
+    parts = item.nodeid.split('::')
+    path = parts[0].rsplit('.', 1)[0]
+    return path.replace('/', '.')
+
+
+def easy_links(item):
+    for mark in item.iter_markers(name=EASY_LINK_MARk):
+        yield (mark.kwargs['link_type'], mark.args[0], mark.kwargs['name'])
+
+
+def get_outcome_status(outcome):
+    _, exception, _ = outcome.excinfo or (None, None, None)
+    return get_status(exception)
+
+
+def get_outcome_status_details(outcome):
+    exception_type, exception, exception_traceback = outcome.excinfo or (None, None, None)
+    return get_status_details(exception_type, exception, exception_traceback)
+
+
+def get_pytest_report_status(pytest_report):
+    pytest_statuses = ('failed', 'passed', 'skipped')
+    statuses = (Status.FAILED, Status.PASSED, Status.SKIPPED)
+    for pytest_status, status in zip(pytest_statuses, statuses):
+        if getattr(pytest_report, pytest_status):
+            return status
+
+
+def format_easy_link(config, url, link_type):
+    pattern = dict(config.option.allure_link_pattern).get(link_type, '{}')
+    return pattern.format(url)

@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 # @author: James Zhang
 # @data  : 2021/9/6
-from easy_automation.utils.exception import AssertFailed
+from easy_automation.utils import AssertFailed
 import allure
 
 

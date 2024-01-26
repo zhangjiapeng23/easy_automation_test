@@ -6,6 +6,8 @@
 from attr import attrs, attrib
 from attr import Factory
 
+ATTACHMENT_PATTERN = '{prefix}-attachment.{ext}'
+
 
 @attrs
 class TestResultContainer:
@@ -33,7 +35,7 @@ class ExecutableItem:
     attachments = attrib(default=Factory(list))
     parameters = attrib(default=Factory(list))
     start = attrib(default=None)
-    end = attrib(default=None)
+    stop = attrib(default=None)
 
 
 @attrs

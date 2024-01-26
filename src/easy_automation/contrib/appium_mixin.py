@@ -4,13 +4,12 @@
 # @data  : 2021/8/5
 from typing import List
 
-from appium.webdriver.webdriver import WebDriver
 from selenium.common.exceptions import NoSuchElementException, InvalidElementStateException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from appium.webdriver.webelement import WebElement
 
-from easy_automation.contrib import elements
+from . import elements
 from easy_automation.utils.custom_logging import Logs
 from .after_error_hook import after_error_hook
 from .before_click_hook import before_click_hook

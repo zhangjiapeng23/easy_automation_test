@@ -3,8 +3,6 @@
 # @author: James Zhang
 # @data  : 2021/7/28
 
-from src.easy_automation.core.template_command import TemplateCommand
-
 
 # class TestTemplateCreateProject:
 #

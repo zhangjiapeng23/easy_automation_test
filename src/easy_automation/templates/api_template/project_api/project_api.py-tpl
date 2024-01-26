@@ -1,5 +1,5 @@
 
-from easy_automation.core.base_request import RequestBase
+from easy_test import RequestBse
 
 
 class {{ project_name }}ServerBase(RequestBase):

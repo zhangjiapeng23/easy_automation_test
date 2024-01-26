@@ -2,63 +2,19 @@
 # -*- encoding: utf-8 -*-
 # @author: James Zhang
 # @data  : 2023/8/10
-import threading
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 
 from allure_commons._core import plugin_manager
 
-from easy_automation.report.model import ExecutableItem, TestResult, Attachment
+from easy_automation.report.model import ExecutableItem, TestResult, Attachment, ATTACHMENT_PATTERN
 from easy_automation.utils.common import now
-
-
-class ThreadContextItems:
-
-    _thread_context = defaultdict(OrderedDict)
-    _init_thread: threading.Thread
-
-    @property
-    def thread_context(self):
-        context = self._thread_context[threading.current_thread()]
-        if not context and threading.current_thread() is not self._init_thread:
-            uuid, last_item = next(reversed(self._thread_context[self._init_thread].items()))
-            context[uuid] = last_item
-        return context
-
-    def __init__(self, *args, **kwargs):
-        self._init_thread = threading.current_thread()
-        super().__init__(*args, **kwargs)
-
-    def __setitem__(self, key, value):
-        self._thread_context.__setitem__(key, value)
-
-    def __getitem__(self, item):
-        return self._thread_context.__getitem__(item)
-
-    def __iter__(self):
-        return self._thread_context.__iter__()
-
-    def __reversed__(self):
-        return self._thread_context.__reversed__()
-
-    def get(self, key):
-        return self._thread_context.get(key)
-
-    def pop(self, key):
-        return self._thread_context.pop(key)
-
-    def cleanup(self):
-        stop_threads = []
-        for thread in self._thread_context.keys():
-            if not thread.is_alive():
-                stop_threads.append(thread)
-        for thread in stop_threads:
-            del self._thread_context[thread]
+from easy_automation.report.types import AttachmentType
 
 
 class EasyReporter:
 
     def __init__(self):
-        self._items = ThreadContextItems()
+        self._items = OrderedDict()
         self._orphan_items = []
 
     def _update_item(self, uuid, **kwargs):
@@ -122,7 +78,6 @@ class EasyReporter:
 
     def close_test(self, uuid):
         test_case = self._items.pop(uuid)
-        self._items.cleanup()
         plugin_manager.hook.report_result(result=test_case)
 
     def drop_test(self, uuid):
@@ -142,3 +97,25 @@ class EasyReporter:
         else:
             self._update_item(uuid, **kwargs)
             self._items.pop(uuid)
+
+    def _attach(self, uuid, name=None, attachment_type=None, extension=None, parent_uuid=None):
+        mime_type = attachment_type
+        extension = extension if extension else 'attach'
+
+        if type(attachment_type) is AttachmentType:
+            extension = attachment_type.extension
+            mine_type = attachment_type.mine_type
+
+        file_name = ATTACHMENT_PATTERN.format(prefix=uuid, ext=extension)
+        attachment = Attachment(source=file_name, name=name, type=mime_type)
+        last_uuid = parent_uuid if parent_uuid else self._last_executable()
+        self._items[last_uuid].attachments.append(attachment)
+
+        return file_name
+
+    def attach_data(self, uuid, body, name=None, attachment_type=None, extension=None, parent_uuid=None):
+        file_name = self._attach(uuid, name=name, attachment_type=attachment_type, extension=extension,
+                                 parent_uuid=parent_uuid)
+        plugin_manager.hook.report_attached_data(body=body, file_name=file_name)
+
+

@@ -6,7 +6,7 @@ import copy
 
 import requests
 
-from ..utils.custom_logging import Logs
+from easy_automation.utils.custom_logging import Logs
 
 
 class RequestBase:
@@ -20,7 +20,8 @@ class RequestBase:
             if params:
                 params += ", "
             params += f"{k}={v}"
-        self.log.debug('{} {} {}'.format(method, url, params))
+        headers = f"headers={self._headers}"
+        self.log.debug('{} {} {} {}'.format(method, url, params, headers))
         return self._session.request(method, url, headers=self._headers, verify=verify, *args, **kwargs)
 
     def set_headers(self, headers_dic: dict):

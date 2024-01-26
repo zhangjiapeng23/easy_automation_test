@@ -2,15 +2,20 @@
 # -*- encoding: utf-8 -*-
 # @author: James Zhang
 # @data  : 2023/8/30
+import doctest
+
 import allure_commons
 import pytest
+from allure_pytest.utils import allure_suite_labels
 
 from easy_automation.utils.common import uuid4, host_tag, thread_tag, now, md5
 from easy_automation.report.types import LabelType
 from easy_automation.report.reporter import EasyReporter
 from easy_automation.report.model import *
+from easy_automation.report.types import AttachmentType, ParameterMode
 from easy_automation.report.utils import get_status, get_status_details, easy_name, easy_full_name, easy_description, \
-    easy_description_html, represent,get_history_id
+    easy_description_html, represent, get_history_id, easy_labels, pytest_markers, platform_label, easy_package, \
+    easy_links, get_outcome_status, get_outcome_status_details, get_pytest_report_status, format_easy_link
 
 
 class EasyListener:
@@ -89,7 +94,7 @@ class EasyListener:
         self._update_fixtures_children(item)
         uuid = self._cache.get(item.nodeid)
         test_result = self.easy_logger.get_test(uuid)
-        params = self.__get_ptytest_params(item)
+        params = self.__get_pytest_params(item)
         test_result.name = easy_name(item, params)
         full_name = easy_full_name(item)
         test_result.full_name = full_name
@@ -97,8 +102,8 @@ class EasyListener:
         test_result.description = easy_description(item)
         test_result.descriptionHtml = easy_description_html(item)
         current_param_names = [param.name for param in test_result.parameters]
-        test_result.parametes.extend([
-            Parameter(name=name, value=represent(value)) for name, value in params.items
+        test_result.parameters.extend([
+            Parameter(name=name, value=represent(value)) for name, value in params.items()
             if name not in current_param_names
         ])
 
@@ -126,6 +131,176 @@ class EasyListener:
             original_values=self.__get_pytest_params(item)
         )
         test_result.labels.extend([Label(name=name, value=value) for name, value in easy_labels(item)])
+        test_result.labels.extend([Label(name=LabelType.TAG, value=value) for value in pytest_markers(item)])
+        self.__apply_default_suites(item, test_result)
+        test_result.labels.append(Label(name=LabelType.HOST, value=self._host))
+        test_result.labels.append(Label(name=LabelType.THREAD, value=self._thread))
+        test_result.labels.append(Label(name=LabelType.FRAMEWORK, value='pytest'))
+        test_result.labels.append(Label(name=LabelType.LANGUAGE, value=platform_label()))
+        test_result.labels.append(Label(name='package', value=easy_package(item)))
+        test_result.links.extend([Link(link_type, url, name) for link_type, url, name in easy_links(item)])
+
+    @pytest.hookimpl(hookwrapper=True)
+    def pytest_fixture_setup(self, fixturedef, request):
+        fixture_name = getattr(fixturedef.func, '__allure_display_name__', fixturedef.argname)
+        container_uuid = self._cache.get(fixturedef)
+        if not container_uuid:
+            container_uuid = self._cache.push(fixturedef)
+            container = TestResultContainer(uuid=container_uuid)
+            self.easy_logger.start_group(container_uuid, container)
+
+        self.easy_logger.update_group(container_uuid, start=now())
+
+        before_fixture_uuid = uuid4()
+        before_fixture = TestBeforeResult(name=fixture_name, start=now())
+        self.easy_logger.start_before_fixture(container_uuid, before_fixture_uuid, before_fixture)
+
+        outcome = yield
+
+        self.easy_logger.stop_before_fixture(before_fixture_uuid, stop=now(), status=get_outcome_status(outcome),
+                                             statusDetails=get_outcome_status_details(outcome))
+
+        finalizers = getattr(fixturedef, '_finalizers', [])
+        for index, finalizer in enumerate(finalizers):
+            finalizer_name = getattr(finalizer, "__name__", index)
+            name = f'{fixture_name}::{finalizer_name}'
+            finalizers[index] = allure_commons.fixture(finalizer, parent_uuid=container_uuid, name=name)
+
+    @pytest.hookimpl(hookwrapper=True)
+    def pytest_fixture_post_finalizer(self, fixturedef):
+        yield
+        if hasattr(fixturedef, 'cached_result') and self._cache.get(fixturedef):
+            container_uuid = self._cache.pop(fixturedef)
+            self.easy_logger.stop_group(container_uuid, stop=now())
+
+    @pytest.hookimpl(hookwrapper=True)
+    def pytest_runtest_makereport(self, item, call):
+        uuid = self._cache.get(item.nodeid)
+
+        report = (yield).get_result()
+
+        test_result = self.easy_logger.get_test(uuid)
+        status = get_pytest_report_status(report)
+        status_details = None
+
+        if call.excinfo:
+            message = call.excinfo.exconly()
+            if hasattr(report, 'wasxfail'):
+                reason = report.wasxfail
+                message = (f'XFAIL {reason}' if reason else 'XFAIL') + '\n\n' + message
+            trace = report.longreprtext
+            status_details = StatusDetails(message=message, trace=trace)
+
+            exception = call.excinfo.value
+            if status != Status.SKIPPED and _exception_brokes_test(exception):
+                status = Status.BROKEN
+
+            if status == Status.PASSED and hasattr(report, 'wasxfail'):
+                reason = report.wasxfail
+                message = f'XPASS {reason}' if reason else 'XPASS'
+                status_details = StatusDetails(message=message)
+
+            if report.when == 'setup':
+                test_result.status = status
+                test_result.statusDetails = status_details
+
+            if report.when == 'call':
+                if test_result.status == Status.PASSED:
+                    test_result.status = status
+                    test_result.statusDetails = status_details
+
+            if report.when == 'teardown':
+                if status in (Status.FAILED, Status.BROKEN) and test_result.status == Status.PASSED:
+                    test_result.status = status
+                    test_result.statusDetails = status_details
+
+                if self.config.option.attach_capture:
+                    if report.caplog:
+                        self.attach_data(report.caplog, "log", AttachmentType.TEXT, None)
+                    if report.capstdout:
+                        self.attach_data(report.capstdout, 'stdout', AttachmentType.TEXT, None)
+                    if report.capstderr:
+                        self.attach_data(reason.capStderr, 'stderr', AttachmentType.TEXT, None)
+
+    @pytest.hookimpl(hookwrapper=True)
+    def pytest_runtest_logfinish(self, nodeid, location):
+        yield
+        uuid = self._cache.pop(nodeid)
+        if uuid:
+            self.easy_logger.close_test(uuid)
+
+    @allure_commons.hookimpl
+    def attach_data(self, body, name, attachment_type, extension):
+        self.easy_logger.attach_data(uuid4(), body, name=name, attachment_type=attachment_type, extension=extension)
+
+    @allure_commons.hookimpl
+    def add_title(self, test_title):
+        test_result = self.easy_logger.get_test(None)
+        if test_result:
+            test_result.name = test_title
+
+    @allure_commons.hookimpl
+    def add_description(self, test_description):
+        test_result = self.easy_logger.get_test(None)
+        if test_result:
+            test_result.description = test_description
+
+    @allure_commons.hookimpl
+    def add_description_html(self, test_description_html):
+        test_result = self.easy_logger.get_test(None)
+        if test_result:
+            test_result.descriptionHtml = test_description_html
+
+    @allure_commons.hookimpl
+    def add_link(self, url, link_type, name):
+        test_result = self.easy_logger.get_test(None)
+        if test_result:
+            link_url = format_easy_link(self.config, url, link_type)
+            new_link = Link(link_type, link_url, link_url if name is None else name)
+            for link in test_result.links:
+                if link.url == new_link.url:
+                    return
+            test_result.links.append(new_link)
+
+    @allure_commons.hookimpl
+    def add_label(self, label_type, labels):
+        test_result = self.easy_logger.get_test(None)
+        for label in labels if test_result else ():
+            test_result.labels.append(Label(label_type, label))
+
+    @allure_commons.hookimpl
+    def add_parameter(self, name, value, excluded, mode: ParameterMode):
+        test_result: TestResult = self.easy_logger.get_test(None)
+        existing_param = next(filter(lambda x: x.name == name, test_result.parameters), None)
+        if existing_param:
+            existing_param.value = represent(value)
+        else:
+            test_result.parameters.append(
+                Parameter(
+                    name=name,
+                    value=represent(value),
+                    excluded=excluded or None,
+                    mode=mode.value if mode else None
+                )
+            )
+
+    @staticmethod
+    def __get_pytest_params(item):
+        return item.callspec.params if hasattr(item, 'callspec') else {}
+
+    def __apply_default_suites(self, item, test_result):
+        default_suites = allure_suite_labels(item)
+        existing_suites = {
+            label.name
+            for label in test_result.labels
+            if label.name in EasyListener.SUITE_LABELS
+        }
+        test_result.labels.extend(
+            Label(name=name, value=value)
+            for name, value in default_suites
+            if name not in existing_suites
+        )
+
 
 class ItemCache:
 
@@ -152,3 +327,11 @@ def _test_fixtures(item):
             if fixturedefs_pytest:
                 fixturedefs.extend(fixturedefs_pytest)
     return fixturedefs
+
+
+def _exception_brokes_test(exception):
+    return not isinstance(exception, (
+        AssertionError,
+        pytest.fail.Exception,
+        doctest.DocTestFailure
+    ))
