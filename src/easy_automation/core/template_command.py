@@ -4,7 +4,7 @@
 # @data  : 2021/7/21
 import os
 
-import src
+import easy_automation
 from easy_automation.utils.exception import CommandError
 from easy_automation.utils.template_render import TemplateRender
 
@@ -84,7 +84,7 @@ class TemplateCommand:
 
     @staticmethod
     def handle_template(template):
-        return os.path.join(src.__path__[0], 'templates', template)
+        return os.path.join(easy_automation.__path__[0], 'templates', template)
 
 
 
