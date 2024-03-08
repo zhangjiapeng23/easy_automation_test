@@ -231,3 +231,8 @@ class Assert:
                 act_sql.pop(key, None)
                 contains_b = all(item in exp_sql.items() for item in act_sql.items())
                 assert contains_b is True
+
+    def detailjson_removeKey(self, data, remove_keys):
+        for key in remove_keys:
+            data.pop(key, None)
+        return data
