@@ -1,5 +1,5 @@
 
-from easy_test import RequestBse
+from easy_test import RequestBase
 
 
 class {{ project_name }}ServerBase(RequestBase):

@@ -10,7 +10,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 PACKAGE = "easy_automation_test"
 
-install_requires=[
+install_requires = [
         'requests>=2.26.0',
         'selenium>=4.8.0',
         'allure-pytest>=2.12.0',
@@ -52,7 +52,8 @@ def main():
         python_requires=">=3.9",
         entry_points={
             'console_scripts': [
-                'easy-automation=easy_automation.utils.command_parser:command_parser'
+                'easy-automation=easy_automation.utils.command_parser:command_parser',
+                "easy-startup=easy_automation.utils.start_up:command_parser"
             ],
             "pytest11":
                 ["easy_automation_pytest=easy_automation.core.plugin"]
