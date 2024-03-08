@@ -3,6 +3,7 @@
 # @author: James Zhang
 # @data  : 2024/1/25
 import os
+import re
 import time
 from typing import List
 
@@ -19,6 +20,7 @@ from easy_automation.report.logger import MemoryLogger
 context: ConfigLoader = ConfigLoader()
 test_listener: EasyListener = None
 logger: MemoryLogger = None
+testcases_collector = set()
 
 log = Logs()
 root_dir = os.path.join(os.path.dirname(__file__), "..")
@@ -38,37 +40,48 @@ def pytest_addoption(parser):
     parser.addoption("--app", action="store", required=True, help="指定测试APP")
     # add test type option
     parser.addoption("--type", action="store", required=True, choices=('web', 'api'), help="指定测试类型")
+    # add collect log optoin
+    parser.addoption("--easy-log", action='store', default='0', choices=('0', '1'), help="采集日志数据")
 
 
 def pytest_configure(config):
     global context
     global test_listener
     global logger
+    allure_report_dir = config.option.allure_report_dir
     env = config.getoption("--env")
     app = config.getoption("--app")
     test_type = config.getoption("--type")
+    log_flag =  config.getoption("--easy-log")
     context.reload_init(app, env, test_type)
     # 添加清理任务：关闭中间件连接
     config.add_cleanup(disconnect_middleware)
-    test_listener = EasyListener(config)
-    config.pluginmanager.register(test_listener, 'easy_listener')
-    allure_commons.plugin_manager.register(test_listener)
-    config.add_cleanup(cleanup_factory(test_listener))
-
-    logger = MemoryLogger()
-    allure_commons.plugin_manager.register(logger)
-    config.add_cleanup(cleanup_factory(logger))
+    # 添加输出report log任务
+    config.add_cleanup(print_report)
+    # 注册 report listener 插件
+    if not allure_report_dir and log_flag == '1':
+        test_listener = EasyListener(config)
+        config.pluginmanager.register(test_listener, 'easy_listener')
+        allure_commons.plugin_manager.register(test_listener)
+        config.add_cleanup(cleanup_factory(test_listener))
+        # 注册 report logger 插件
+        logger = MemoryLogger()
+        allure_commons.plugin_manager.register(logger)
+        config.add_cleanup(cleanup_factory(logger))
 
 
 def disconnect_middleware():
     MiddlewareABC.close_all_connect()
-    print(logger.test_cases)
-    print(logger.test_containers)
-    print(logger.attachments)
 
 
-def pytest_collection_modifyitems(
-        session: "Session", config: "Config", items: List["Item"]) -> None:
+def print_report():
+    if logger:
+        print(logger.test_cases)
+        print(logger.test_containers)
+        print(logger.attachments)
+
+
+def pytest_collection_modifyitems(session: "Session", config: "Config", items: List["Item"]) -> None:
     """Called after collection has been performed. May filter or re-order
        the items in-place.
 
@@ -80,19 +93,13 @@ def pytest_collection_modifyitems(
         item.name = item.name.encode('utf-8').decode('unicode-escape')
         item._nodeid = item.nodeid.encode('utf-8').decode('unicode-escape')
 
-    # nodeid_record_path = os.path.join(root_dir, "testcases_nodeid_record.txt")
+    def clean_node_id(node_id):
+        rule = re.compile(r'(?P<node_id>[^\[\]]+)(?P<param>\[*.*\]*)')
+        res = rule.match(node_id._nodeid)
+        node_id = res.group('node_id')
+        return node_id
 
-    # def clean_node_id(node_id):
-    #     rule = re.compile(r'(?P<node_id>[^\[\]]+)(?P<param>\[*.*\]*)')
-    #     res = rule.match(node_id._nodeid)
-    #     node_id = res.group('node_id')
-    #     return node_id
-
-    # clean_nodeid = list(set(map(clean_node_id, items)))
-    # with open(nodeid_record_path, 'w', encoding='utf-8') as f:
-    #     for nodeid in clean_nodeid:
-    #         f.write(nodeid+'\n')
-    #         log.debug(nodeid)
+    testcases_collector.update(map(clean_node_id, items))
 
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):

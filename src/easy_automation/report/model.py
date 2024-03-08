@@ -6,11 +6,15 @@
 from attr import attrs, attrib
 from attr import Factory
 
+TEST_GROUP_PATTERN = "{prefix}-container.json"
+TEST_CASE_PATTERN = "{prefix}-result.json"
 ATTACHMENT_PATTERN = '{prefix}-attachment.{ext}'
 
 
 @attrs
 class TestResultContainer:
+    file_pattern = TEST_GROUP_PATTERN
+
     uuid = attrib(default=None)
     name = attrib(default=None)
     children = attrib(default=Factory(list))
@@ -40,6 +44,8 @@ class ExecutableItem:
 
 @attrs
 class TestResult(ExecutableItem):
+    file_pattern = TEST_CASE_PATTERN
+
     uuid = attrib(default=None)
     historyId = attrib(default=None)
     testCaseId = attrib(default=None)
