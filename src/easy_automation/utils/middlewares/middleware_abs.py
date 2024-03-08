@@ -18,21 +18,14 @@ class MiddlewareABC(metaclass=ABCMeta):
 
     @classmethod
     def close_all_connect(cls):
-        for i in cls._db_connect.values():
-            if hasattr(i, '_close_connect'):
-                getattr(i, '_close_connect')()
+        db_connect_key = []
+        for k, v in cls._db_connect.items():
+            if hasattr(v, '_close_connect'):
+                getattr(v, '_close_connect')()
+                db_connect_key.append(k)
+        for k in db_connect_key:
+            cls._db_connect.pop(k)
 
     @abc.abstractmethod
     def _create_connect(self, db_name):
         raise NotImplementedError("create connect method is not implemented!")
-
-
-
-
-
-
-
-
-
-
-
