@@ -11,6 +11,7 @@ import os
 import time
 from collections import abc
 from functools import wraps
+import json
 
 import pytest
 
@@ -215,3 +216,18 @@ class TearDown:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._func(*self._args, **self.__kwargs)
         return False
+
+
+class Assert:
+    def JsonEqu(self, exp_body, act_body):
+        assert json.dumps(exp_body, sort_keys=True) == json.dumps(act_body, sort_keys=True)
+
+    def JsonContains(self, exp_sql, act_sql, remove_key_boe=None):
+        if remove_key_boe is None:
+            contains_b = all(item in exp_sql.items() for item in act_sql.items())
+            assert contains_b is True
+        else:
+            for key in remove_key_boe:
+                act_sql.pop(key, None)
+                contains_b = all(item in exp_sql.items() for item in act_sql.items())
+                assert contains_b is True
