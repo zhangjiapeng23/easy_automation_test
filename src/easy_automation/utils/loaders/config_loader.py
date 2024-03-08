@@ -18,10 +18,13 @@ class ConfigLoader:
     """
     加载对应环境，app的 setting 和 testdata 数据
     """
+    TESTDATA_FILENAME = "testdata.yaml"
+    SETTINGS_FILENAME = "settings"
 
     def __init__(self, app=None, env=None, test_type=None):
         self._testdata = _TestData()
         self._settings = None
+        self._app_setting = None
         if all((app, env, test_type)):
             self._init(app, env, test_type)
 
@@ -30,21 +33,21 @@ class ConfigLoader:
 
     def _init(self, app, env, test_type):
         app_name = f"{app}_{test_type}_test"
-        testdata_filename = "testdata.yaml"
-        settings_filename = "settings"
         root_dir = find_project_root_dir()
-
-        origin_testdata_dir = os.path.join(root_dir, app_name, 'testdata', testdata_filename)
-        origin_settings_filename = settings_filename
-
-        settings_filename = f"{env}_{settings_filename}"
+        origin_testdata_dir = os.path.join(root_dir, app_name, 'testdata', self.TESTDATA_FILENAME)
+        settings_filename = f"{env}_{self.SETTINGS_FILENAME}"
         testdata_dir = os.path.join(root_dir, app_name, 'testdata', f"{env}")
 
         # 初始化setting
-        origin_settings = SettingLoader(origin_settings_filename)
+        base_settings = SettingLoader(self.SETTINGS_FILENAME)
         settings = SettingLoader(settings_filename)
-        settings.merge_from(origin_settings)
-        self._settings = _SettingsProxy(env, settings)
+        settings.merge_from(base_settings)
+
+        if self.app_setting is None or self.app_setting.env != env:
+            # 初始化APP setting
+            self._app_setting = AppLoader(settings.APPS, env)
+
+        self._settings = _SettingsProxy(settings)
 
         # 初始化testdata
         origin_testdata = YamlLoader(origin_testdata_dir)
@@ -67,40 +70,39 @@ class ConfigLoader:
     def settings(self):
         return self._settings
 
+    @property
+    def app_setting(self):
+        return self._app_setting
+
     def api_url(self, app, path_name):
-        if hasattr(self._settings.apps, app):
-            app_loader = getattr(self._settings.apps, app)
+        if hasattr(self.app_setting, app):
+            app_loader = getattr(self.app_setting, app)
             path = getattr(app_loader.path, path_name)
-            if hasattr(app_loader, 'host'):
+            if hasattr(app_loader, 'host') and getattr(app_loader, 'host') is not None:
                 return getattr(app_loader, 'host') + path
             return self._settings['PROJECT_HOST'] + path
         raise RuntimeError(f"Not find {app} project settings")
 
     def api_url_ip(self, app, path_name):
-        if hasattr(self._settings.apps, app):
-            app_loader = getattr(self._settings.apps, app)
+        if hasattr(self.app_setting, app):
+            app_loader = getattr(self.app_setting, app)
             path = getattr(app_loader.path, path_name)
             return app_loader.ip + path
         raise RuntimeError(f"Not find {app} project settings")
 
     def api_url_custom_host(self, app, path_name, host):
-        if hasattr(self._settings.apps, app):
-            app_loader = getattr(self._settings.apps, app)
+        if hasattr(self.app_setting, app):
+            app_loader = getattr(self.app_setting, app)
             path = getattr(app_loader.path, path_name)
             return host + path
         raise RuntimeError(f"Not find {app} project settings")
 
 
-
 class _SettingsProxy:
 
-    def __init__(self, env, settings):
+    def __init__(self, settings):
         self._settings = settings
         middleware = self._settings.MIDDLEWARE
-        apps = self._settings.APPS
-
-        # 初始化注册app
-        self._app = AppLoader(apps, env)
 
         # 初始化mysql代理对象
         if hasattr(middleware, 'mysql'):
@@ -130,10 +132,6 @@ class _SettingsProxy:
         if self._redis:
             return self._redis.get_connect(db_name)
         raise RuntimeError("Not set redis config")
-
-    @property
-    def apps(self):
-        return self._app
 
     def __getitem__(self, item):
         return getattr(self._settings, item)
