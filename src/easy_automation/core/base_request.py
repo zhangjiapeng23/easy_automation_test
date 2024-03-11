@@ -22,7 +22,9 @@ class RequestBase:
             params += f"{k}={v}"
         headers = f"headers={self._headers}"
         self.log.debug('{} {} {} {}'.format(method, url, params, headers))
-        return self._session.request(method, url, headers=self._headers, verify=verify, *args, **kwargs)
+        resp = self._session.request(method, url, headers=self._headers, verify=verify, *args, **kwargs)
+        self.log.debug(f'status code: {resp.status_code}, response: {resp.text}')
+        return resp
 
     def set_headers(self, headers_dic: dict):
         self._headers = copy.deepcopy(headers_dic)
