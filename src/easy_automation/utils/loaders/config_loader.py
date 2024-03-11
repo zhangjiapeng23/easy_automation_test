@@ -23,6 +23,7 @@ class ConfigLoader:
 
     def __init__(self, app=None, env=None, test_type=None):
         self._testdata = _TestData()
+        self._base_setting = SettingLoader(self.SETTINGS_FILENAME)
         self._settings = None
         self._app_setting = None
         if all((app, env, test_type)):
@@ -39,9 +40,8 @@ class ConfigLoader:
         testdata_dir = os.path.join(root_dir, app_name, 'testdata', f"{env}")
 
         # 初始化setting
-        base_settings = SettingLoader(self.SETTINGS_FILENAME)
         settings = SettingLoader(settings_filename)
-        settings.merge_from(base_settings)
+        settings.merge_from(self.base_setting)
 
         if self.app_setting is None or self.app_setting.env != env:
             # 初始化APP setting
@@ -73,6 +73,10 @@ class ConfigLoader:
     @property
     def app_setting(self):
         return self._app_setting
+
+    @property
+    def base_setting(self):
+        return self._base_setting
 
     def api_url(self, app, path_name):
         if hasattr(self.app_setting, app):

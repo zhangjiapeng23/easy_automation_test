@@ -40,8 +40,8 @@ class TestCaseSyncHandler(tornado.web.RequestHandler, ABC):
 
     def get(self):
         cl = ConfigLoader()
-        if hasattr(cl.base_settings, 'APPS'):
-            app_list = getattr(cl.base_settings, 'APPS')
+        if hasattr(cl.base_setting, 'APPS'):
+            app_list = getattr(cl.base_setting, 'APPS')
             app_obj_list = [App(**getattr(setting, "_FrozenJson__data")) for setting in app_list]
             for app in app_obj_list:
                 pytest.main([f"{app.name}_{app.type}_test", '--collect-only', '-q', '--app', app.name,
@@ -84,7 +84,7 @@ def worker():
         app, _type, testcases = q.get()
         log.info("testcases execute start")
         try:
-            pytest.main([*testcases, '--app', app, '--type', _type])
+            pytest.main([*testcases, '-vs', '--app', app, '--type', _type])
         except Exception as e:
             log.error(e)
         log.info("testcases execute end")

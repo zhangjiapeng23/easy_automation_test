@@ -3,17 +3,19 @@
 # @author: James Zhang
 # @data  : 2021/7/20
 import importlib
+import sys
 
 from attr import attrs, attrib, asdict
 
-from easy_automation.utils.common import FrozenJson
+from easy_automation.utils.common import FrozenJson, find_project_root_dir
 
 
 class SettingLoader:
 
-    def __init__(self, settings_filename):
+    def __init__(self, settings_filename='settings'):
         settings_package = 'settings'
         settings_filename = f".{settings_filename}"
+        sys.path.append(find_project_root_dir())
         _settings = importlib.import_module(settings_filename, package=settings_package)
         for setting in dir(_settings):
             if setting.isupper():
