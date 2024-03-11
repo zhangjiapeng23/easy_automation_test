@@ -222,7 +222,7 @@ class Assert:
     def JsonEqu(self, exp_body, act_body):
         assert json.dumps(exp_body, sort_keys=True) == json.dumps(act_body, sort_keys=True)
 
-    def JsonContains(self, exp_sql, act_sql, remove_key_boe=None):
+    def JsonContains(self, remove_key_boe=None, exp_sql=None, act_sql=None):
         if remove_key_boe is None:
             contains_b = all(item in exp_sql.items() for item in act_sql.items())
             assert contains_b is True
