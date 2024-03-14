@@ -41,3 +41,4 @@ class RequestBase:
 
     def clear_header(self):
         self._headers.clear()
+

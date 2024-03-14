@@ -18,10 +18,11 @@ install_requires = [
         'Faker>=8.10.1',
         'pytest-xdist>=2.3.0',
         'kubernetes>=25.3.0',
-        'tornado>=6.2',
         'redis>=4.5.1',
         'pytest>=6.2.4',
-        'PyMySQL>=1.0.2'
+        'PyMySQL>=1.0.2',
+        'flask>=3.0.2',
+        'waitress>=3.0.0'
     ]
 
 
@@ -52,8 +53,7 @@ def main():
         python_requires=">=3.9",
         entry_points={
             'console_scripts': [
-                'easy-automation=easy_automation.utils.command_parser:command_parser',
-                "easy-startup=easy_automation.utils.start_up:command_parser"
+                'easy-automation=easy_automation.utils.command_parser:command_parser'
             ],
             "pytest11":
                 ["easy_automation_pytest=easy_automation.core.plugin"]
