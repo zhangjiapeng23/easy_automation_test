@@ -8,6 +8,7 @@ from easy_automation.utils.common import TearDown
 from easy_automation.core.base_request import RequestBase
 from easy_automation.utils.common import Assert
 from easy_automation.service import create_app
+from easy_automation.utils.custom_logging import Logs
 
 __all__ = [
     'easy_parametrize',
@@ -15,5 +16,6 @@ __all__ = [
     'context',
     'RequestBase',
     'Assert',
-    'create_app'
+    'create_app',
+    'Logs'
 ]
