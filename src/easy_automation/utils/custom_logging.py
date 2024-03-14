@@ -16,24 +16,24 @@ class Logs:
     _log_instance = {}
 
     def __init__(self, log_name='easy-automation'):
-        sl = SettingLoader()
-        # 是否debug模式
-        if hasattr(sl, 'DEBUG'):
-            is_debug = getattr(sl, 'DEBUG')
-        else:
-            is_debug = False
-        # 文本日志等级
-        if hasattr(sl, 'FH_LOG_LEVEL') and is_debug:
-            fh_level = getattr(sl, 'FH_LOG_LEVEL')
-        else:
-            fh_level = logging.DEBUG
-        # 终端日志等级
-        if hasattr(sl, 'SH_LOG_LEVEL') and is_debug:
-            sh_level = getattr(sl, 'SH_LOG_LEVEL')
-        else:
-            sh_level = logging.INFO
-
         if log_name not in self._log_instance:
+            sl = SettingLoader()
+            # 是否debug模式
+            if hasattr(sl, 'DEBUG'):
+                is_debug = getattr(sl, 'DEBUG')
+            else:
+                is_debug = False
+            # 文本日志等级
+            if hasattr(sl, 'FH_LOG_LEVEL') and is_debug:
+                fh_level = getattr(sl, 'FH_LOG_LEVEL')
+            else:
+                fh_level = logging.DEBUG
+            # 终端日志等级
+            if hasattr(sl, 'SH_LOG_LEVEL') and is_debug:
+                sh_level = getattr(sl, 'SH_LOG_LEVEL')
+            else:
+                sh_level = logging.INFO
+
             _log = logging.getLogger(log_name)
             formatter = logging.Formatter('%(asctime)s [%(name)s] %(levelname)s'
                                           ': %(message)s',
