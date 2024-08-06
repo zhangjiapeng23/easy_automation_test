@@ -151,15 +151,21 @@ class _TestDataProxy:
 
     def case(self, case_name):
         case = getattr(self, "_case").get(case_name)
+        if not case:
+            raise RuntimeError(f"Test data does not find {case_name}.")
         return self._parse_data(case)
 
     def account(self, account_name):
         account = getattr(self, "_account").get(account_name)
+        if not account:
+            raise RuntimeError(f"Test data does not find {account_name}.")
         return self._parse_data(account)
 
     def fake(self, name):
         faker = CustomFaker()
         fake = getattr(self, '_fake').get(name)
+        if not fake:
+            raise RuntimeError(f"Test data does not find {name}.")
         if isinstance(fake, list):
             data_values = []
             ids = []
@@ -221,6 +227,8 @@ class _TestDataProxy:
 
         def inner(name):
             data = getattr(self, _item).get(name)
+            if not data:
+                raise RuntimeError(f"Test data does not find {name}.")
             return self._parse_data(data)
 
         return inner

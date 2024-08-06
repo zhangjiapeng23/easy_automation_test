@@ -69,4 +69,6 @@ class Kube:
             log.warning(f"Under this path: {conf_path}, not find k8s config")
             setattr(self, "get_pod_ip", get_pod_id_error)
 
-
+    def __del__(self):
+        self._coreV1.api_client.rest_client.pool_manager.clear()
+        self._coreV1.api_client.close()
