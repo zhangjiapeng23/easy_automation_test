@@ -22,7 +22,7 @@ class ConfigLoader:
     SETTINGS_FILENAME = "settings"
 
     def __init__(self, app=None, env=None, test_type=None):
-        self._testdata = _TestData()
+        self._testdata = _TestData(app)
         self._base_setting = SettingLoader(self.SETTINGS_FILENAME)
         self._settings = None
         self._app_setting = None
@@ -34,6 +34,7 @@ class ConfigLoader:
 
     def _init(self, app, env, test_type):
         app_name = f"{app}_{test_type}_test"
+        self._testdata.app = app
         root_dir = find_project_root_dir()
         origin_testdata_dir = os.path.join(root_dir, app_name, 'testdata', self.TESTDATA_FILENAME)
         settings_filename = f"{env}_{self.SETTINGS_FILENAME}"
@@ -51,7 +52,7 @@ class ConfigLoader:
 
         # 初始化testdata
         origin_testdata = YamlLoader(origin_testdata_dir)
-        setattr(self._testdata, 'testdata', _TestDataProxy(origin_testdata))
+        setattr(self._testdata, 'testdata', _TestDataProxy('testdata', origin_testdata))
         testdata_filename_dict = {}
         for _, _, files in os.walk(testdata_dir):
             for file in files:
@@ -60,7 +61,7 @@ class ConfigLoader:
         for k, v in testdata_filename_dict.items():
             testdata = YamlLoader(v)
             testdata.merge_from(origin_testdata)
-            setattr(self._testdata, k, _TestDataProxy(testdata))
+            setattr(self._testdata, k, _TestDataProxy(k, testdata))
 
     @property
     def testdata(self):
@@ -143,7 +144,8 @@ class _SettingsProxy:
 
 class _TestDataProxy:
 
-    def __init__(self, testdata):
+    def __init__(self, filename,  testdata):
+        self._filename = filename
         self._testdata = testdata
         if self._testdata:
             for key in self._testdata.keys():
@@ -152,20 +154,20 @@ class _TestDataProxy:
     def case(self, case_name):
         case = getattr(self, "_case").get(case_name)
         if not case:
-            raise RuntimeError(f"Test data does not find {case_name}.")
+            raise AttributeError(f"Test data '{self._filename}.case' does not have '{case_name}' attribute!")
         return self._parse_data(case)
 
     def account(self, account_name):
         account = getattr(self, "_account").get(account_name)
         if not account:
-            raise RuntimeError(f"Test data does not find {account_name}.")
+            raise AttributeError(f"Test data '{self._filename}.account' does not have '{account_name}' attribute!")
         return self._parse_data(account)
 
     def fake(self, name):
         faker = CustomFaker()
         fake = getattr(self, '_fake').get(name)
         if not fake:
-            raise RuntimeError(f"Test data does not find {name}.")
+            raise AttributeError(f"Test data '{self._filename}.fake' does not have '{name}' attribute!")
         if isinstance(fake, list):
             data_values = []
             ids = []
@@ -228,19 +230,33 @@ class _TestDataProxy:
         def inner(name):
             data = getattr(self, _item).get(name)
             if not data:
-                raise RuntimeError(f"Test data does not find {name}.")
+                item = _item.split("_")[1]
+                raise AttributeError(f"Test data '{self._filename}.{item}' does not have '{name}' attribute!")
             return self._parse_data(data)
 
         return inner
 
     def __getattr__(self, item):
-        _item = "_" + item
-        if hasattr(self, _item):
-            return self._wrapper(_item)
+        if item.startswith('_'):
+            item = item.split('_')[1]
+            raise AttributeError(f"Test data file '{self._filename}' does not have '{item}' attribute!")
 
-        raise AttributeError(f"{self.__class__.__name__} does not hava '{item}' attribute.")
+        return self._wrapper(f"_{item}")
 
 
 class _TestData:
-    pass
+
+    def __init__(self, app):
+        self._app = app
+
+    @property
+    def app(self):
+        return self._app
+
+    @app.setter
+    def app(self, v):
+        self._app = v
+
+    def __getattr__(self, item):
+        raise RuntimeError(f"APP {self.app} directory not find '{item}' testdata file!")
 

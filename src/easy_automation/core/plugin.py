@@ -9,6 +9,8 @@ from typing import List
 
 import allure_commons
 import pytest
+from allure_pytest.utils import ALLURE_LABEL_MARK
+
 
 from easy_automation.utils.custom_logging import Logs
 from easy_automation.utils.loaders.config_loader import ConfigLoader
@@ -19,7 +21,7 @@ from easy_automation.report.logger import MemoryLogger
 # 装载全局配置和测试数据对象
 context: ConfigLoader = ConfigLoader()
 test_listener: EasyListener = None
-logger: MemoryLogger = None
+logger: MemoryLogger = MemoryLogger()
 testcases_collector = set()
 
 log = Logs()
@@ -52,12 +54,12 @@ def pytest_configure(config):
     env = config.getoption("--env")
     app = config.getoption("--app")
     test_type = config.getoption("--type")
-    log_flag =  config.getoption("--easy-log")
+    log_flag = config.getoption("--easy-log")
     context.reload_init(app, env, test_type)
     # 添加清理任务：关闭中间件连接
     config.add_cleanup(disconnect_middleware)
     # 添加输出report log任务
-    config.add_cleanup(print_report)
+    # config.add_cleanup(print_report)
     # 注册 report listener 插件
     if not allure_report_dir and log_flag == '1':
         test_listener = EasyListener(config)
@@ -65,7 +67,7 @@ def pytest_configure(config):
         allure_commons.plugin_manager.register(test_listener)
         config.add_cleanup(cleanup_factory(test_listener))
         # 注册 report logger 插件
-        logger = MemoryLogger()
+        # logger = MemoryLogger()
         allure_commons.plugin_manager.register(logger)
         config.add_cleanup(cleanup_factory(logger))
 
@@ -74,11 +76,11 @@ def disconnect_middleware():
     MiddlewareABC.close_all_connect()
 
 
-def print_report():
-    if logger:
-        print(logger.test_cases)
-        print(logger.test_containers)
-        print(logger.attachments)
+# def print_report():
+#     if logger:
+#         print(logger.test_cases)
+#         print(logger.test_containers)
+#         print(logger.attachments)
 
 
 def pytest_collection_modifyitems(session: "Session", config: "Config", items: List["Item"]) -> None:
@@ -90,14 +92,23 @@ def pytest_collection_modifyitems(session: "Session", config: "Config", items: L
        :param List[pytest.Item] items: List of item objects.
        """
     for item in items:
-        item.name = item.name.encode('utf-8').decode('unicode-escape')
-        item._nodeid = item.nodeid.encode('utf-8').decode('unicode-escape')
+        # item.name = item.name.encode('utf-8').decode('unicode-escape')
+        # item._nodeid = item.nodeid.encode('utf-8').decode('unicode-escape')
 
-    def clean_node_id(node_id):
-        rule = re.compile(r'(?P<node_id>[^\[\]]+)(?P<param>\[*.*\]*)')
-        res = rule.match(node_id._nodeid)
-        node_id = res.group('node_id')
-        return node_id
+        # 查找该用例allure maker label 设置的用例名
+        for mark in item.iter_markers(name=ALLURE_LABEL_MARK):
+            item._allure_label = mark.args[0]
+
+        # 不存在则给上用例function name
+        if not hasattr(item, "_allure_label"):
+            item._allure_label = item.name
+
+    def clean_node_id(item):
+        rule = re.compile(r'(?P<item>[^\[\]]+)(?P<param>\[*.*\]*)')
+        res = rule.match(item._nodeid)
+        node_id = res.group('item')
+        lebel = item._allure_label
+        return (node_id, lebel)
 
     testcases_collector.update(map(clean_node_id, items))
 

@@ -31,3 +31,8 @@ class MemoryLogger:
     @hookimpl
     def report_attached_data(self, body, file_name):
         self.attachments[file_name] = body
+
+    def clear_data(self):
+        self.test_cases = []
+        self.test_containers = []
+        self.attachments = {}
