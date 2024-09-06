@@ -3,7 +3,7 @@
 '''
 import logging
 
-DEBUG = FALSE
+DEBUG = False
 
 # project host
 PROJECT_HOST = ''

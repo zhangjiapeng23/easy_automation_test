@@ -33,6 +33,7 @@ install_requires = [
     'Faker>=8.11.0',
     'flask>=3.0.2',
     'google-auth>=2.16.0',
+    'gunicorn>=23.0.0',
     'h11>=0.13.0',
     'idna>=3.2',
     'importlib-metadata>=4.6.1',
@@ -93,7 +94,7 @@ install_requires = [
 def main():
     setuptools.setup(
         name=PACKAGE,
-        version='0.0.8',
+        version='0.0.8.2',
         author='jameszhang',
         author_email='18373230129@163.com',
         description='Easy to create a web or api automation test project',
