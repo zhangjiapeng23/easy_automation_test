@@ -7,6 +7,7 @@ import random
 
 import requests
 from consulate import Consul
+from consulate.models.agent import Check
 
 
 class ConsulClient:
@@ -19,11 +20,10 @@ class ConsulClient:
 
     def register(self, name, port, http_check=None, service_id=None, address=None, tags=None, interval=None):
         self.consul.agent.service.register(name=name, service_id=service_id, address=address, port=port, tags=tags,
-                                           interval=interval, httpcheck=http_check)
+                                           check=Check(name=name, http=http_check, interval=interval))
 
     def deregister(self, service_id):
-        self.consul.agent.service.deregister(service_id)
-        self.consul.agent.check.deregister(service_id)
+        return self.consul.agent.service.deregister(service_id)
 
     def get_service(self, name):
         url = f"http://{self.host}:{self.port}/v1/catalog/service/{name}"
@@ -72,3 +72,6 @@ class ConsulClient:
     def token(self):
         return self._token
 
+if __name__ == '__main__':
+    c = ConsulClient(host='39.98.80.78', port='8500')
+    c.deregister('Temp_TEST_AGENT')

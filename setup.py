@@ -26,7 +26,7 @@ install_requires = [
     'charset-normalizer>=2.0.3',
     'click>=8.1.7',
     'colorama>=0.4.4',
-    'consulate>=0.6.0',
+    'consulate-fork>=0.7.1',
     'cryptography>=36.0.2',
     'docutils>=0.17.1',
     'exceptiongroup>=1.1.0',
@@ -94,7 +94,7 @@ install_requires = [
 def main():
     setuptools.setup(
         name=PACKAGE,
-        version='0.0.8.2',
+        version='0.0.8.3',
         author='jameszhang',
         author_email='18373230129@163.com',
         description='Easy to create a web or api automation test project',
