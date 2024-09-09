@@ -48,10 +48,12 @@ def sync():
 
 @bp.post('/execute')
 def execute():
-    service_name = current_app.config.get('SERVICE_NAME')
-    c: ConsulClient = current_app.config.get('CONSUL')
-    ip, port = c.get_service(service_name)
-    upload_result_url = f'http://{id}:{port}/api/result/upload'
+    upload_result_url = None
+    if not current_app.config.get('DEBUG'):
+        service_name = current_app.config.get('FLASK_SERVICE_NAME')
+        c: ConsulClient = current_app.config.get('CONSUL')
+        ip, port = c.get_service(service_name)
+        upload_result_url = f'http://{id}:{port}/api/result/upload'
     data = request.get_json()
     app = data.get("app")
     _type = data.get('type')
@@ -75,7 +77,7 @@ def worker():
             log.info(f"taskId: {task_id} execute end")
 
             # 上传测试结果数据
-            if not current_app.config.get('DEBUG'):
+            if upload_result_url:
                 upload_result(upload_result_url, data)
         except Exception as e:
             log.error(e)
