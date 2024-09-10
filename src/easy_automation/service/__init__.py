@@ -60,7 +60,8 @@ def create_app(test_config=None):
     app.register_blueprint(health.bp)
 
     def unregister_consul():
-        for _id in service_ids:
+        while len(service_ids) > 0:
+            _id = service_ids.pop()
             res = consul_instance.deregister(_id)
             if res:
                 log.info(f"service-id: {service_id} unregister consul success")
