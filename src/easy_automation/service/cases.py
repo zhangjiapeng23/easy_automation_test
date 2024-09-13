@@ -21,7 +21,7 @@ q = queue.Queue()
 
 log = Logs(log_name=__name__)
 
-bp = Blueprint('cases', __name__, url_prefix=f'/api/agent/cases')
+bp = Blueprint('cases', __name__)
 
 
 @bp.get('/sync')

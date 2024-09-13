@@ -14,3 +14,6 @@ FLASK_CONSUL_TAGS = []
 
 # rancher 上服务名，自行修改
 FLASK_SERVICE_NAME = '{{ project_name }}-test-agent'
+
+# 配置服务接口前缀(可自行调整，防止与其他服务重名）
+FLASK_URL_PREFIX = "/api/agent"

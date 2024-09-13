@@ -54,12 +54,16 @@ def create_app(test_config=None):
         except Exception as e:
             raise RuntimeError(f"Service register consul fail: {e}")
 
+    url_prefix = app.config.get("FLASK_URL_PREFIX", "/api/agent")
+
     from . import cases
+    cases.bp.url_prefix = f'{url_prefix}/cases'
     app.register_blueprint(cases.bp)
+
     from . import health
     app.register_blueprint(health.bp)
 
-    def unregister_consul():
+    def deregister_consul():
         while len(service_ids) > 0:
             _id = service_ids.pop()
             res = consul_instance.deregister(_id)
@@ -69,10 +73,10 @@ def create_app(test_config=None):
                 log.warning(f"service-id: {service_id} unregister consul fail")
 
     def signal_handler(_signal, frame):
-        unregister_consul()
+        deregister_consul()
         sys.exit(0)
 
-    atexit.register(unregister_consul)
+    atexit.register(deregister_consul)
     signal.signal(signal.SIGINT, signal_handler)
 
     return app
