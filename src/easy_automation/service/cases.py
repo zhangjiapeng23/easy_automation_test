@@ -49,11 +49,14 @@ def sync():
 @bp.post('/execute')
 def execute():
     upload_result_url = None
-    if not current_app.config.get('DEBUG'):
-        service_name = current_app.config.get('FLASK_SERVICE_NAME')
-        c: ConsulClient = current_app.config.get('CONSUL')
-        ip, port = c.get_service(service_name)
-        upload_result_url = f'http://{id}:{port}/api/result/upload'
+    try:
+        if not current_app.config.get('DEBUG'):
+            service_name = current_app.config.get('FLASK_SERVICE_NAME')
+            c: ConsulClient = current_app.config.get('CONSUL')
+            ip, port = c.get_service(service_name)
+            upload_result_url = f'http://{id}:{port}/api/result/upload'
+    except Exception as e:
+        log.error(f"获取平台服务地址出错：{e}")
     data = request.get_json()
     app = data.get("app")
     _type = data.get('type')

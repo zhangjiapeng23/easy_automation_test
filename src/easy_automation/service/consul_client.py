@@ -41,7 +41,7 @@ class ConsulClient:
         service_list = []
         for dc in dc_set:
             url = f"http://{self.host}:{self.port}/v1/health/service/{name}?dc={dc}"
-            if self.toke:
+            if self.token:
                 url += f"&token={self.token}"
             resp = requests.get(url)
             if resp.status_code != 200:
