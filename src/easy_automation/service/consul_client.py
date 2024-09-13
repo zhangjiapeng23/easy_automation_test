@@ -6,8 +6,9 @@ import json
 import random
 
 import requests
-from consulate import Consul
-from consulate.models.agent import Check
+import consul
+# from consulate import Consul
+# from consulate.models.agent import Check
 
 
 class ConsulClient:
@@ -16,11 +17,14 @@ class ConsulClient:
         self._host = host
         self._port = port
         self._token = token
-        self._consul = Consul(host=host, port=port, token=token)
+        # self._consul = Consul(host=host, port=port, token=token)
+        self._consul = consul.Consul(host=host, port=port, token=token)
 
     def register(self, name, port, http_check=None, service_id=None, address=None, tags=None, interval=None):
+        # self.consul.agent.service.register(name=name, service_id=service_id, address=address, port=port, tags=tags,
+        #                                    check=Check(name=name, http=http_check, interval=interval))
         self.consul.agent.service.register(name=name, service_id=service_id, address=address, port=port, tags=tags,
-                                           check=Check(name=name, http=http_check, interval=interval))
+                                           check=consul.Check.http(url=http_check, interval=interval))
 
     def deregister(self, service_id):
         return self.consul.agent.service.deregister(service_id)
@@ -73,5 +77,5 @@ class ConsulClient:
         return self._token
 
 if __name__ == '__main__':
-    c = ConsulClient(host='39.98.80.78', port='8500')
+    c = ConsulClient(host='10.70.2.40', port='8500')
     c.deregister('Temp_TEST_AGENT')
