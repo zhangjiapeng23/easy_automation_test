@@ -4,10 +4,10 @@
 # @data  : 2024/8/30
 from flask import Blueprint
 
-bp = Blueprint('health', __name__, url_prefix=f'/health')
+bp = Blueprint('health', __name__)
 
 
-@bp.get("/")
+@bp.get("/health")
 def health_check():
     return "ok"
 
