@@ -17,12 +17,10 @@ class ConsulClient:
         self._host = host
         self._port = port
         self._token = token
-        # self._consul = Consul(host=host, port=port, token=token)
         self._consul = consul.Consul(host=host, port=port, token=token)
 
     def register(self, name, port, http_check=None, service_id=None, address=None, tags=None, interval=None):
-        # self.consul.agent.service.register(name=name, service_id=service_id, address=address, port=port, tags=tags,
-        #                                    check=Check(name=name, http=http_check, interval=interval))
+
         self.consul.agent.service.register(name=name, service_id=service_id, address=address, port=port, tags=tags,
                                            check=consul.Check.http(url=http_check, interval=interval))
 

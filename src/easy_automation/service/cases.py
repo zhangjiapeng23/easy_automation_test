@@ -51,7 +51,7 @@ def execute():
     upload_result_url = None
     try:
         if not current_app.config.get('DEBUG'):
-            service_name = current_app.config.get('FLASK_SERVICE_NAME')
+            service_name = current_app.config.get('FLASK_CENTER_SERVICE_NAME')
             c: ConsulClient = current_app.config.get('CONSUL')
             ip, port = c.get_service(service_name)
             upload_result_url = f'http://{id}:{port}/api/result/upload'

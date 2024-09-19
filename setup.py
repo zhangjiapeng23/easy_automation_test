@@ -94,7 +94,7 @@ install_requires = [
 def main():
     setuptools.setup(
         name=PACKAGE,
-        version='0.0.8.5',
+        version='0.0.8.6',
         author='jameszhang',
         author_email='18373230129@163.com',
         description='Easy to create a web or api automation test project',

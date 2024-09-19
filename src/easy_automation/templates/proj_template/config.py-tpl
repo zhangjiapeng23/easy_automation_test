@@ -17,3 +17,6 @@ FLASK_SERVICE_NAME = '{{ project_name }}-test-agent'
 
 # 配置服务接口前缀(可自行调整，防止与其他服务重名）
 FLASK_URL_PREFIX = "/api/agent"
+
+# 测试测试平台的服务名
+FLASK_CENTER_SERVICE_NAME = ""
