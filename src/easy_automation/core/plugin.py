@@ -114,13 +114,14 @@ def pytest_collection_modifyitems(session: "Session", config: "Config", items: L
 
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    global logger
     result = {}
     passed = len([i for i in terminalreporter.stats.get('passed', []) if i.when != 'teardown'])
     failed = len([i for i in terminalreporter.stats.get('failed', []) if i.when != 'teardown'])
     error = len([i for i in terminalreporter.stats.get('error', []) if i.when != 'teardown'])
     skipped = len([i for i in terminalreporter.stats.get('skipped', []) if i.when != 'teardown'])
     total = passed + failed + error + skipped
-    passed_rate = '%.2f' % (passed / total * 100) + '%' if total > 0 else 0
+    passing_rate = '%.2f' % (passed / total * 100) + '%' if total > 0 else 0
     duration = time.time() - terminalreporter._sessionstarttime
     result_format = 'total: {}, passed: {}, failed: {}, error: {}, skipped: {}, passed_rate: {}, duration: {}'
     log.info(result_format.format(total, passed, failed, error, skipped, passed_rate, duration))
@@ -129,5 +130,12 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     result['failed'] = failed
     result['error'] = error
     result['skipped'] = skipped
-    result['passing_rate'] = passed_rate
+    result['passing_rate'] = passing_rate
     result['duration'] = round(duration, 2)
+    logger.passed = passed
+    logger.failed = failed
+    logger.error = error
+    logger.skipped = skipped
+    logger.total = total
+    logger.passing_rate = passing_rate
+    logger.duration = duration

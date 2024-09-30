@@ -7,8 +7,6 @@ import random
 
 import requests
 import consul
-# from consulate import Consul
-# from consulate.models.agent import Check
 
 
 class ConsulClient:
@@ -76,4 +74,4 @@ class ConsulClient:
 
 if __name__ == '__main__':
     c = ConsulClient(host='10.70.2.40', port='8500')
-    c.deregister('Temp_TEST_AGENT')
+    print(c.get_service('sRouter2'))

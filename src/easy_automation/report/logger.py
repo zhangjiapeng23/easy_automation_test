@@ -13,6 +13,13 @@ class MemoryLogger:
         self.test_cases = []
         self.test_containers = []
         self.attachments = {}
+        self.passed = 0
+        self.failed = 0
+        self.error = 0
+        self.skipped = 0
+        self.total = 0
+        self.passing_rate = 0
+        self.duration = 0
 
     @hookimpl
     def report_result(self, result):
@@ -36,3 +43,10 @@ class MemoryLogger:
         self.test_cases = []
         self.test_containers = []
         self.attachments = {}
+        self.passed = 0
+        self.failed = 0
+        self.error = 0
+        self.skipped = 0
+        self.total = 0
+        self.passing_rate = 0
+        self.duration = 0
