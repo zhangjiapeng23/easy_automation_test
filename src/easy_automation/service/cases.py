@@ -62,7 +62,7 @@ def execute():
     testcases = data.get('testcases')
     task_id = data.get('taskId')
     q.put((app, _type, testcases, task_id, upload_result_url))
-    return task_id
+    return "true"
 
 
 def worker():
