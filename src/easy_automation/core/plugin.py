@@ -124,7 +124,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     passing_rate = '%.2f' % (passed / total * 100) + '%' if total > 0 else 0
     duration = time.time() - terminalreporter._sessionstarttime
     result_format = 'total: {}, passed: {}, failed: {}, error: {}, skipped: {}, passed_rate: {}, duration: {}'
-    log.info(result_format.format(total, passed, failed, error, skipped, passed_rate, duration))
+    log.info(result_format.format(total, passed, failed, error, skipped, passing_rate, duration))
     result['testcases_total'] = total
     result['passed'] = passed
     result['failed'] = failed
