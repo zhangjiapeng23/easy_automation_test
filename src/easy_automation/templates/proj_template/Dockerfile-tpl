@@ -1,4 +1,4 @@
-FROM python:3.9.20-slim
+FROM pre-harbor.webull.com/webull/easy-automation-test:latest
 
 WORKDIR /test-agent
 

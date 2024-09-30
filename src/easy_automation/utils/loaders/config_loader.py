@@ -33,7 +33,10 @@ class ConfigLoader:
         self._init(app, env, test_type)
 
     def _init(self, app, env, test_type):
-        app_name = f"{app}_{test_type}_test"
+        # app_name = f"{app}_{test_type}_test"
+        app_name = app
+         # test_type 暂时废弃
+        test_type = test_type
         self._testdata.app = app
         root_dir = find_project_root_dir()
         origin_testdata_dir = os.path.join(root_dir, app_name, 'testdata', self.TESTDATA_FILENAME)
