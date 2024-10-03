@@ -73,7 +73,8 @@ def worker():
             pytest.main([*testcases, '--app', app, '--type', _type, '--easy-log', '1'])
             data = {
                 'executeRecordId': task_id,
-                'result': json.dumps(logger.test_cases),
+                'result': json.dumps(logger.test_cases, ensure_ascii=False),
+                'passed': logger.passed,
                 'failed': logger.failed,
                 'error': logger.error,
                 'skipped': logger.skipped,
@@ -93,7 +94,7 @@ def worker():
 
 
 def upload_result(url, data):
-    log.info(f"上传测试结果：{url}, data: {data}")
+    log.info(f"上传测试结果：{url}")
     resp = requests.post(url=url, json=data)
     if resp.status_code == 200:
         log.info(f"taskId: {data.get('taskId')} result upload success, data: {data}")
