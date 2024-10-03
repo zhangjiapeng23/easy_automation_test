@@ -73,8 +73,7 @@ def worker():
             pytest.main([*testcases, '--app', app, '--type', _type, '--easy-log', '1'])
             data = {
                 'executeRecordId': task_id,
-                'result': logger.test_cases,
-                'passed': logger.passed,
+                'result': json.dumps(logger.test_cases),
                 'failed': logger.failed,
                 'error': logger.error,
                 'skipped': logger.skipped,
