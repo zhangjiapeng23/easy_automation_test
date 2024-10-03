@@ -53,7 +53,7 @@ def execute():
         if not current_app.config.get('DEBUG'):
             c: ConsulClient = current_app.config.get('CONSUL')
             ip, port = c.get_service("sRouter2")
-            upload_result_url = f'http://{id}:{port}/api/oa_test/execute_record/update_result'
+            upload_result_url = f'http://{ip}:{port}/api/oa_test/execute_record/update_result'
     except Exception as e:
         log.error(f"获取平台服务地址出错：{e}")
     data = request.get_json()
