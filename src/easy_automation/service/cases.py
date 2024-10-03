@@ -94,6 +94,7 @@ def worker():
 
 
 def upload_result(url, data):
+    log.info(f"上传测试结果：{url}, data: {data}")
     resp = requests.post(url=url, json=data)
     if resp.status_code == 200:
         log.info(f"taskId: {data.get('taskId')} result upload success, data: {data}")
