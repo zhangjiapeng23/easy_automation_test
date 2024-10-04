@@ -97,9 +97,9 @@ def upload_result(url, data):
     log.info(f"上传测试结果：{url}")
     resp = requests.post(url=url, json=data)
     if resp.status_code == 200:
-        log.info(f"taskId: {data.get('taskId')} result upload success, data: {data}")
+        log.info(f"taskId: {data.get('executeRecordId')} result upload success, data: {data}")
     else:
-        log.error(f"taskId: {data.get('taskId')} result upload failed, msg: {resp.text}, data: {data}")
+        log.error(f"taskId: {data.get('executeRecordId')} result upload failed, msg: {resp.text}, data: {data}")
 
 
 threading.Thread(target=worker, daemon=True).start()
