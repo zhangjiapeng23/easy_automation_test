@@ -74,4 +74,4 @@ class ConsulClient:
 
 if __name__ == '__main__':
     c = ConsulClient(host='10.70.2.40', port='8500')
-    print(c.get_service('sRouter2'))
+    ip, port = c.get_service('sRouter2')

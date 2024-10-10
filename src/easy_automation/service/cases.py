@@ -53,7 +53,7 @@ def execute():
         if not current_app.config.get('DEBUG'):
             c: ConsulClient = current_app.config.get('CONSUL')
             ip, port = c.get_service("sRouter2")
-            upload_result_url = f'http://{id}:{port}/api/oa-test/execute_record/update_result'
+            upload_result_url = f'http://{ip}:{port}/api/oa-test/execute_record/update_result'
     except Exception as e:
         log.error(f"获取平台服务地址出错：{e}")
     data = request.get_json()
@@ -73,7 +73,7 @@ def worker():
             pytest.main([*testcases, '--app', app, '--type', _type, '--easy-log', '1'])
             data = {
                 'executeRecordId': task_id,
-                'result': logger.test_cases,
+                'result': json.dumps(logger.test_cases, ensure_ascii=False),
                 'passed': logger.passed,
                 'failed': logger.failed,
                 'error': logger.error,
@@ -94,11 +94,12 @@ def worker():
 
 
 def upload_result(url, data):
+    log.info(f"上传测试结果：{url}")
     resp = requests.post(url=url, json=data)
     if resp.status_code == 200:
-        log.info(f"taskId: {data.get('taskId')} result upload success, data: {data}")
+        log.info(f"taskId: {data.get('executeRecordId')} result upload success, data: {data}")
     else:
-        log.error(f"taskId: {data.get('taskId')} result upload failed, msg: {resp.text}, data: {data}")
+        log.error(f"taskId: {data.get('executeRecordId')} result upload failed, msg: {resp.text}, data: {data}")
 
 
 threading.Thread(target=worker, daemon=True).start()
