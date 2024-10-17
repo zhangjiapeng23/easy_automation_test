@@ -31,7 +31,7 @@ def sync():
         app_list = getattr(cl.base_setting, 'APPS')
         app_obj_list = [App(**getattr(setting, "_FrozenJson__data")) for setting in app_list]
         for app in app_obj_list:
-            pytest.main([f"{app.name}_{app.type}_test", '--collect-only', '-q', '--app', app.name,
+            pytest.main([f"{app.name}", '--collect-only', '-q', '--app', app.name,
                          '--type', app.type])
         resp = []
         for code, name in testcases_collector:
