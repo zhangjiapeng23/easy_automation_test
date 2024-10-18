@@ -15,10 +15,10 @@ from easy_automation.utils.common import md5
 from easy_automation.report.types import LabelType
 
 
-EASY_DESCRIPTION_MARK = 'easy_description'
-EASY_DESCRIPTION_HTML_MARK = 'east_description_html'
-EASY_LABEL_MARK = 'easy_label'
-EASY_LINK_MARk = 'easy_link'
+EASY_DESCRIPTION_MARK = 'allure_description'
+EASY_DESCRIPTION_HTML_MARK = 'allure_description_html'
+EASY_LABEL_MARK = 'allure_label'
+EASY_LINK_MARk = 'allure_link'
 
 EASY_UNIQUE_LABELS = [
     LabelType.SEVERITY,

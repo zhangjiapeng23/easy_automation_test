@@ -98,6 +98,8 @@ def pytest_collection_modifyitems(session: "Session", config: "Config", items: L
         # 查找该用例allure maker label 设置的用例名
         for mark in item.iter_markers(name=ALLURE_LABEL_MARK):
             item._allure_label = mark.args[0]
+            # 可能存在多个label, 取最近的一个后就返回
+            break
 
         # 不存在则给上用例function name
         if not hasattr(item, "_allure_label"):
