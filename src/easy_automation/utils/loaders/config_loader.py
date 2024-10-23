@@ -47,7 +47,7 @@ class ConfigLoader:
         settings = SettingLoader(settings_filename)
         settings.merge_from(self.base_setting)
 
-        if self.app_setting is None or self.app_setting.env != env:
+        if self.app_setting is None or self.app_setting.env != env or self.app_setting.is_expired:
             # 初始化APP setting
             self._app_setting = AppLoader(settings.APPS, env)
 

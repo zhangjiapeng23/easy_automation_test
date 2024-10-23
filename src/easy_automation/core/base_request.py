@@ -21,8 +21,8 @@ class RequestBase:
                 params += ", "
             params += f"{k}={v}"
         headers = f"headers={self._headers}"
-        self.log.debug('{} {} {} {}'.format(method, url, params, headers))
-        resp = self._session.request(method, url, headers=self._headers, verify=verify, *args, **kwargs)
+        self.log.info('{} {} {} {}'.format(method, url, params, headers))
+        resp = self._session.request(method, url, headers=self._headers, verify=verify, timeout=10, *args, **kwargs)
         self.log.debug(f'status code: {resp.status_code}, response: {resp.text}')
         return resp
 
