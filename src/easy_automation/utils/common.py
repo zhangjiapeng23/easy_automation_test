@@ -286,3 +286,27 @@ class Assert:
         assert contains_a == True, "The expected SQL dict contains items that are not in the actual SQL dict."
 
 
+    def TraversalJson(self,data,exp_key,Expected):
+        """遍历json，取指定的值进行循环校验
+            data: 指定的json数据
+            exp_key: 指定的key
+            Expected： 预期结果
+        """
+        Newlist = []
+        for rows in data:
+            values = rows[f'{exp_key}']
+            Newlist.append(values)
+        print(Newlist)
+        for Actual in Newlist:
+            assert Actual == Expected
+
+    def SQL_selectall_list_Equ(self,selectAll,Exp_body,remove_key=None):
+
+        NewList = []
+        num = len(selectAll)
+        for i in range(num):
+            if num > i:
+                newbody = Assert.detailjson_removeKey(self, def_convert_objects(selectAll[i]), remove_key)
+                NewList.append(newbody)
+        print('========SQL_selectall_list_Equ========》', Fore.RED,NewList)
+        assert json.dumps(Exp_body, sort_keys=True) == json.dumps(NewList, sort_keys=True)
