@@ -16,7 +16,7 @@ from colorama import Fore
 import pytest
 from decimal import Decimal
 from .exception import PathFindError
-
+import datetime
 # 将字典中的Decimal对象转换为浮点数，并将datetime对象转换为日期字符串
 def def_convert_objects(data_dict):
     for key, value in data_dict.items():
@@ -26,7 +26,6 @@ def def_convert_objects(data_dict):
             data_dict[key] = value.strftime('%Y-%m-%d %H:%M:%S')  # 格式化日期
     return data_dict
 
-import datetime
 
 
 class Singleton(type):
@@ -243,7 +242,8 @@ class Assert:
                 contains_b = all(item in exp_sql.items() for item in act_sql.items())
                 assert contains_b is True
 
-    def detailjson_removeKey(self, data, remove_keys):
+    # 移除json对象键值对
+    def Json_removeKey(self, data, remove_keys):
         for key in remove_keys:
             data.pop(key, None)
         return data
