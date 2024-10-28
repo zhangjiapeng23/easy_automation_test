@@ -306,7 +306,7 @@ class Assert:
         num = len(selectAll)
         for i in range(num):
             if num > i:
-                newbody = Assert.detailjson_removeKey(self, def_convert_objects(selectAll[i]), remove_key)
+                newbody = Assert.Json_removeKey(self, def_convert_objects(selectAll[i]), remove_key)
                 NewList.append(newbody)
         print('========SQL_selectall_list_Equ========》', Fore.RED,NewList)
         assert json.dumps(Exp_body, sort_keys=True) == json.dumps(NewList, sort_keys=True)
