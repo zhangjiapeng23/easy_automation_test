@@ -49,7 +49,7 @@ class ConfigLoader:
 
         if self.app_setting is None or self.app_setting.env != env or self.app_setting.is_expired:
             # 初始化APP setting
-            self._app_setting = AppLoader(settings.APPS, env)
+            self._app_setting = AppLoader(settings.APPS, env, settings.CONSUL_DIR)
 
         self._settings = _SettingsProxy(settings)
 

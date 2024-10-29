@@ -8,6 +8,8 @@ DEBUG = False
 # project host
 PROJECT_HOST = ''
 
+CONSUL_DIR = ""
+
 MIDDLEWARE = {
     "mysql": {
         "host": "",
