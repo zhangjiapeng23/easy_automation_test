@@ -12,10 +12,20 @@ import time
 from collections import abc
 from functools import wraps
 import json
-
+from colorama import Fore
 import pytest
-
+from decimal import Decimal
 from .exception import PathFindError
+import datetime
+# 将字典中的Decimal对象转换为浮点数，并将datetime对象转换为日期字符串
+def def_convert_objects(data_dict):
+    for key, value in data_dict.items():
+        if isinstance(value, Decimal):
+            data_dict[key] = float(value)
+        elif isinstance(value, datetime.datetime):
+            data_dict[key] = value.strftime('%Y-%m-%d %H:%M:%S')  # 格式化日期
+    return data_dict
+
 
 
 class Singleton(type):
@@ -232,7 +242,71 @@ class Assert:
                 contains_b = all(item in exp_sql.items() for item in act_sql.items())
                 assert contains_b is True
 
-    def detailjson_removeKey(self, data, remove_keys):
+    # 移除json对象键值对
+    def Json_removeKey(self, data, remove_keys):
         for key in remove_keys:
             data.pop(key, None)
         return data
+
+    def AssertJsonEqu_print(self,remove_key,exp_sql,act_sql):
+        """
+            json对象对比输出不同的key与value
+            remove_key：需要移除的key
+            exp_sql：预期值
+            act_sql：实际值
+        """
+        for key in remove_key:
+            act_sql.pop(key, None)
+        print('================AssertJsonEqu_print================>>>',Fore.GREEN,def_convert_objects(act_sql))
+        # 收集不匹配的项
+        differences = []
+
+        # 用预期遍历实际，对比json中的键值对
+        for key, value in act_sql.items():
+            if exp_sql.get(key, 'null') != value:
+                differences.append((key, value, exp_sql.get(key)))
+        contains_b = all(item[0] in exp_sql and item[1] == exp_sql[item[0]] for item in act_sql.items())
+
+        # 用实际遍历预期，对比json中的键值对
+        for key, value in exp_sql.items():
+            if act_sql.get(key,'null') != value:
+                differences.append((key, value, act_sql.get(key)))
+        contains_a = all(item[0] in act_sql and item[1] == act_sql[item[0]] for item in exp_sql.items())
+
+        if not contains_b:
+            # 如果断言条件为False，则打印不匹配的项
+            for diff in differences:
+                print(f"Key: {diff[0]}, Actual Value: {diff[1]}, Expected Value: {diff[2]}",'======》预期与实际键值对不一致')
+        assert contains_b == True, "The actual SQL dict contains items that are not in the expected SQL dict."
+
+        if not contains_a:
+            # 如果断言条件为False，则打印不匹配的项
+            for diff in differences:
+                print(f"Key: {diff[0]}, Expected Value: {diff[1]}, Actual Value: {diff[2]}",'======》预期与实际键值对不一致')
+        assert contains_a == True, "The expected SQL dict contains items that are not in the actual SQL dict."
+
+
+    def TraversalJson(self,data,exp_key,Expected):
+        """遍历json，取指定的值进行循环校验
+            data: 指定的json数据
+            exp_key: 指定的key
+            Expected： 预期结果
+        """
+        Newlist = []
+        for rows in data:
+            values = rows[f'{exp_key}']
+            Newlist.append(values)
+        print(Newlist)
+        for Actual in Newlist:
+            assert Actual == Expected
+
+    def SQL_selectall_list_Equ(self,selectAll,Exp_body,remove_key=None):
+
+        NewList = []
+        num = len(selectAll)
+        for i in range(num):
+            if num > i:
+                newbody = Assert.Json_removeKey(self, def_convert_objects(selectAll[i]), remove_key)
+                NewList.append(newbody)
+        print('========SQL_selectall_list_Equ========》', Fore.RED,NewList)
+        assert json.dumps(Exp_body, sort_keys=True) == json.dumps(NewList, sort_keys=True)
