@@ -18,7 +18,7 @@ def get_pod_ip(self):
 
     def wrapper(namespace, deployment):
         # 获取对应namespace 下的所有deployment
-        deployments = self._appV1.list_namespaced_deployment(namespace=namespace, timeout_seconds=10).items
+        deployments = self._appV1.list_namespaced_deployment(namespace=namespace, timeout_seconds=20).items
         deployment_obj = None
         ips = []
         for dp in deployments:
@@ -41,7 +41,7 @@ def get_pod_ip(self):
                     labels += ","
                 labels += (k + "=" + v)
             # 通过match_label 找出对应的pod
-            pods = self._coreV1.list_namespaced_pod(namespace=namespace, label_selector=labels, timeout_seconds=10).items
+            pods = self._coreV1.list_namespaced_pod(namespace=namespace, label_selector=labels, timeout_seconds=20).items
 
             # 组装pod的ip和port
             for p in pods:

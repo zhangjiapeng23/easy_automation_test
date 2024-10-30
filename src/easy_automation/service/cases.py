@@ -70,7 +70,8 @@ def worker():
         app, _type, testcases, task_id, upload_result_url = q.get()
         log.info(f"taskId: {task_id} execute start")
         try:
-            pytest.main([*testcases, '--app', app, '--type', _type, '--easy-log', '1'])
+            pytest.main([*testcases, '--app', app, '--type', _type, '--easy-log', '1', '--reruns', '1',
+                         '--reruns-delay', '2'])
             data = {
                 'executeRecordId': task_id,
                 'result': json.dumps(logger.test_cases, ensure_ascii=False),
