@@ -230,6 +230,7 @@ class TearDown:
 
 class Assert:
     def JsonEqu(self, exp_body, act_body):
+        print(act_body)
         assert json.dumps(exp_body, sort_keys=True) == json.dumps(act_body, sort_keys=True)
 
     def JsonContains(self, remove_key_boe=None, exp_sql=None, act_sql=None):
