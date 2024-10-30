@@ -97,7 +97,7 @@ class EasyListener:
         params = self.__get_pytest_params(item)
         test_result.name = easy_name(item, params)
         full_name = easy_full_name(item)
-        test_result.full_name = full_name
+        test_result.fullName = full_name
         test_result.testCaseId = md5(full_name)
         test_result.description = easy_description(item)
         test_result.descriptionHtml = easy_description_html(item)
