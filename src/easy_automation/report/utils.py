@@ -6,6 +6,7 @@
 import traceback
 from traceback import format_exception_only
 import string
+import re
 
 import pytest
 import platform
@@ -179,6 +180,12 @@ def easy_package(item):
     parts = item.nodeid.split("::")
     path = parts[0].rsplit(".", 1)[0]
     return path.replace('/', '.')
+
+
+def easy_code(item):
+    rule = re.compile(r'(?P<item>[^\[\]]+)(?P<param>\[*.*\]*)')
+    res = rule.match(item._nodeid)
+    return res.group('item')
 
 
 def easy_name(item, parameters):

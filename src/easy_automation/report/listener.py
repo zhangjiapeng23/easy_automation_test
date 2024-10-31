@@ -15,7 +15,7 @@ from easy_automation.report.model import *
 from easy_automation.report.types import AttachmentType, ParameterMode
 from easy_automation.report.utils import get_status, get_status_details, easy_name, easy_full_name, easy_description, \
     easy_description_html, represent, get_history_id, easy_labels, pytest_markers, platform_label, easy_package, \
-    easy_links, get_outcome_status, get_outcome_status_details, get_pytest_report_status, format_easy_link
+    easy_links, get_outcome_status, get_outcome_status_details, get_pytest_report_status, format_easy_link, easy_code
 
 
 class EasyListener:
@@ -138,6 +138,7 @@ class EasyListener:
         test_result.labels.append(Label(name=LabelType.FRAMEWORK, value='pytest'))
         test_result.labels.append(Label(name=LabelType.LANGUAGE, value=platform_label()))
         test_result.labels.append(Label(name='package', value=easy_package(item)))
+        test_result.labels.append(Label(name='caseCode', value=easy_code(item)))
         test_result.links.extend([Link(link_type, url, name) for link_type, url, name in easy_links(item)])
 
     @pytest.hookimpl(hookwrapper=True)
