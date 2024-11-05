@@ -53,9 +53,12 @@ class ConfigLoader:
 
         self._settings = _SettingsProxy(settings)
 
-        # 初始化testdata
-        origin_testdata = YamlLoader(origin_testdata_dir)
-        setattr(self._testdata, 'testdata', _TestDataProxy('testdata', origin_testdata))
+        if os.path.exists(origin_testdata_dir):
+            # 初始化testdata
+            origin_testdata = YamlLoader(origin_testdata_dir)
+            setattr(self._testdata, 'testdata', _TestDataProxy('testdata', origin_testdata))
+        else:
+            origin_testdata = None
         testdata_filename_dict = {}
         for _, _, files in os.walk(testdata_dir):
             for file in files:
@@ -63,7 +66,8 @@ class ConfigLoader:
                 testdata_filename_dict[file_name] = os.path.join(testdata_dir, file)
         for k, v in testdata_filename_dict.items():
             testdata = YamlLoader(v)
-            testdata.merge_from(origin_testdata)
+            if origin_testdata:
+                testdata.merge_from(origin_testdata)
             setattr(self._testdata, k, _TestDataProxy(k, testdata))
 
     @property
