@@ -230,7 +230,7 @@ class TearDown:
 
 class Assert:
     def JsonEqu(self, exp_body, act_body):
-        print(act_body)
+        print('================JsonEqu================>>>',act_body)
         assert json.dumps(exp_body, sort_keys=True) == json.dumps(act_body, sort_keys=True)
 
     def JsonContains(self, remove_key_boe=None, exp_sql=None, act_sql=None):
@@ -311,3 +311,11 @@ class Assert:
                 NewList.append(newbody)
         print('========SQL_selectall_list_Equ========》', Fore.RED,NewList)
         assert json.dumps(Exp_body, sort_keys=True) == json.dumps(NewList, sort_keys=True)
+
+    """
+    状态码验证
+    """
+    def status_code_assert(self,resp):
+        if resp.status_code is not 200:
+            print(resp.json())
+        assert resp.status_code == 200
