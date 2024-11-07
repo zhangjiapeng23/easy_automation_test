@@ -11,8 +11,10 @@ from easy_automation.utils.custom_logging import Logs
 
 class RequestBase:
     log = Logs(__name__)
-    _session = requests.session()
-    _headers = {}
+
+    def __init__(self):
+        self._session = requests.session()
+        self._headers = {}
 
     def send(self, method, url, verify=False, *args, **kwargs):
         params = ""
