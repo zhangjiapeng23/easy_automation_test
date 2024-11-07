@@ -22,7 +22,7 @@ from easy_automation.report.logger import MemoryLogger
 context: ConfigLoader = ConfigLoader()
 test_listener: EasyListener = None
 logger: MemoryLogger = MemoryLogger()
-testcases_collector = set()
+testcases_collector = {}
 
 log = Logs()
 root_dir = os.path.join(os.path.dirname(__file__), "..")
@@ -96,23 +96,26 @@ def pytest_collection_modifyitems(session: "Session", config: "Config", items: L
         # item._nodeid = item.nodeid.encode('utf-8').decode('unicode-escape')
 
         # 查找该用例allure maker label 设置的用例名
+        item._allure_label = []
         for mark in item.iter_markers(name=ALLURE_LABEL_MARK):
-            item._allure_label = mark.args[0]
-            # 可能存在多个label, 取最近的一个后就返回
-            break
+            label = {'key': mark.kwargs.get('label_type'), 'value': mark.args[0]}
+            item._allure_label.append(label)
 
         # 不存在则给上用例function name
-        if not hasattr(item, "_allure_label"):
-            item._allure_label = item.name
+        # if not hasattr(item, "_allure_label"):
+        #     item._allure_label = item.name
 
     def clean_node_id(item):
         rule = re.compile(r'(?P<item>[^\[\]]+)(?P<param>\[*.*\]*)')
         res = rule.match(item._nodeid)
         node_id = res.group('item')
-        lebel = item._allure_label
-        return (node_id, lebel)
+        labels = item._allure_label
+        param = res.group('param').lstrip('[').rstrip(']')
+        case = testcases_collector.setdefault(node_id, Case(node_id, labels, []))
+        case.params.append(param)
 
-    testcases_collector.update(map(clean_node_id, items))
+    for i in items:
+        clean_node_id(i)
 
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
@@ -141,3 +144,12 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     logger.total = total
     logger.passing_rate = passing_rate
     logger.duration = duration
+
+
+class Case:
+
+    def __init__(self, node_id, labels, params):
+        self.node_id = node_id
+        self.labels = labels
+        self.params = params
+

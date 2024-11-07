@@ -34,12 +34,22 @@ def sync():
             pytest.main([f"{app.name}", '--collect-only', '-q', '--app', app.name,
                          '--type', app.type])
         resp = []
-        for code, name in testcases_collector:
-            app = code.split("/")[0]
+        for case in testcases_collector.values():
+            name = case.node_id
+            suit = "未命名"
+            for label in case.labels:
+                if label.get('key') == 'feature' or label.get('key') == 'story':
+                    name = label.get('value')
+                elif label.get('key') == 'epic':
+                    suit = label.get('value')
+
+            app = case.node_id.split("/")[0]
             resp.append({
                 'app': app,
-                'code': code,
-                'name': name
+                'code': case.node_id,
+                'name': name,
+                'suit': suit,
+                'params': case.params
             })
         return json.dumps(resp, ensure_ascii=False)
     else:
